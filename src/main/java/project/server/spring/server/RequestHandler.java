@@ -1,4 +1,4 @@
-package project.server.http.server;
+package project.server.spring.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+
+import project.server.spring.server.http.HttpRequest;
+import project.server.spring.server.http.HttpResponse;
 
 public final class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -19,9 +22,19 @@ public final class RequestHandler extends Thread {
     public void run() {
         log.info("Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
         try (
-                InputStream ignored = connection.getInputStream();
+                InputStream in = connection.getInputStream();
                 OutputStream out = connection.getOutputStream()
         ) {
+            HttpRequest request;
+            //TODO: 리팩토링 필요
+            try {
+                request = new HttpRequest(in);
+            } catch (Exception e) {
+                log.info("invalid request: {}", e.getMessage());
+                return;
+            }
+            log.info("content type, {}",request.getContentType());
+            HttpResponse response = new HttpResponse(out);
             InputStream fis = getClass().getClassLoader().getResourceAsStream("index.html");
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
             StringBuilder stringBuilder = new StringBuilder();

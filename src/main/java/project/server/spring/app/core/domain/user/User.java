@@ -1,4 +1,4 @@
-package project.server.http.app.core.domain.user;
+package project.server.spring.app.core.domain.user;
 
 import lombok.Getter;
 

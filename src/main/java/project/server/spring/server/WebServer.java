@@ -1,4 +1,4 @@
-package project.server.http.server;
+package project.server.spring.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,7 @@ public class WebServer {
     private static final int DEFAULT_PORT = 8083;
 
     public static void main(String[] args) throws Exception {
+        log.info("java version : {}", System.getProperty("java.version"));
         int port = 0;
         if (args == null || args.length == 0) {
             port = DEFAULT_PORT;

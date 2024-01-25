@@ -1,4 +1,4 @@
-package project.server.http.server.common.utils;
+package project.server.spring.server.common.utils;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
