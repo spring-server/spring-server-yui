@@ -78,4 +78,20 @@ public class HttpRequest {
 	public String getHeader(String key) {
 		return headers.get(key);
 	}
+
+	public String getPath() {
+		return path;
+	}
+
+	public String getBody() {
+		return body;
+	}
+
+	public HttpHeaders getHeaders() {
+		return headers;
+	}
+
+	public Map<String, String> getQueryParams() {
+		return queryParams;
+	}
 }

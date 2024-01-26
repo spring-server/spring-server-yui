@@ -1,10 +1,15 @@
 package project.server.spring.server;
 
+import java.net.ServerSocket;
+import java.net.Socket;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.ServerSocket;
-import java.net.Socket;
+import project.server.spring.framework.context.BeanRegistry;
+import project.server.spring.framework.context.ComponentRegistrator;
+import project.server.spring.framework.context.ComponentRegistratorImpl;
+import project.server.spring.framework.context.JavaComponentRegistrator;
 
 public class WebServer {
 
@@ -13,6 +18,9 @@ public class WebServer {
 
     public static void main(String[] args) throws Exception {
         log.info("java version : {}", System.getProperty("java.version"));
+        BeanRegistry beanContainer = new BeanRegistry();
+        ComponentRegistrator componentRegistrator = new JavaComponentRegistrator(beanContainer);
+        componentRegistrator.start();
         int port = 0;
         if (args == null || args.length == 0) {
             port = DEFAULT_PORT;
@@ -24,7 +32,7 @@ public class WebServer {
             log.info("Web Application Server started {} port.", port);
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                RequestHandler requestHandler = new RequestHandler(connection);
+                RequestHandler requestHandler = new RequestHandler(connection, beanContainer);
                 requestHandler.start();
             }
         }

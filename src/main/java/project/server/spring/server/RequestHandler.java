@@ -7,16 +7,22 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+// import project.server.spring.framework.context.BeanContainer;
+import project.server.spring.framework.context.BeanRegistry;
+import project.server.spring.framework.servlet.DispatcherServlet;
+import project.server.spring.framework.servlet.HttpServletRequest;
 import project.server.spring.server.http.HttpRequest;
 import project.server.spring.server.http.HttpResponse;
 
 public final class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+    private final BeanRegistry beanRegistry;
 
     private Socket connection;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, BeanRegistry beanRegistry) {
         this.connection = connectionSocket;
+        this.beanRegistry = beanRegistry;
     }
 
     public void run() {
@@ -34,6 +40,8 @@ public final class RequestHandler extends Thread {
                 return;
             }
             log.info("content type, {}",request.getContentType());
+            DispatcherServlet dispatcherServlet = new DispatcherServlet(beanRegistry);
+            dispatcherServlet.service(new HttpServletRequest(request), null);
             HttpResponse response = new HttpResponse(out);
             InputStream fis = getClass().getClassLoader().getResourceAsStream("index.html");
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
