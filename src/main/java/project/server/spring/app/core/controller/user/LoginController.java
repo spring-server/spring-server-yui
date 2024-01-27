@@ -3,6 +3,7 @@ package project.server.spring.app.core.controller.user;
 import project.server.spring.app.core.repository.user.UserRepository;
 import project.server.spring.framework.annotation.Controller;
 import project.server.spring.framework.annotation.RequestMapping;
+import project.server.spring.server.http.HttpMethod;
 
 @Controller
 public class LoginController {
@@ -12,7 +13,7 @@ public class LoginController {
 		this.userRepository = userRepository;
 	}
 
-	@RequestMapping
+	@RequestMapping(value = "/login", method = HttpMethod.POST)
 	public void login() {
 	}
 }

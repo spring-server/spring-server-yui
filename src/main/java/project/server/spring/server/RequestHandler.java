@@ -11,8 +11,10 @@ import java.nio.charset.StandardCharsets;
 import project.server.spring.framework.context.BeanRegistry;
 import project.server.spring.framework.servlet.DispatcherServlet;
 import project.server.spring.framework.servlet.HttpServletRequest;
+import project.server.spring.framework.servlet.HttpServletResponse;
 import project.server.spring.server.http.HttpRequest;
 import project.server.spring.server.http.HttpResponse;
+import project.server.spring.server.http.HttpStatus;
 
 public final class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -36,52 +38,14 @@ public final class RequestHandler extends Thread {
             try {
                 request = new HttpRequest(in);
             } catch (Exception e) {
+                // e.printStackTrace();
                 log.info("invalid request: {}", e.getMessage());
                 return;
             }
+            HttpResponse response = new HttpResponse(out);
             log.info("content type, {}",request.getContentType());
             DispatcherServlet dispatcherServlet = new DispatcherServlet(beanRegistry);
-            dispatcherServlet.service(new HttpServletRequest(request), null);
-            HttpResponse response = new HttpResponse(out);
-            InputStream fis = getClass().getClassLoader().getResourceAsStream("index.html");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-            String index = stringBuilder.toString();
-            byte[] buffer = index.getBytes(StandardCharsets.UTF_8);
-
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, buffer.length);
-            responseBody(dos, buffer);
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(
-            DataOutputStream dos,
-            int lengthOfBodyContent
-    ) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(
-            DataOutputStream dos,
-            byte[] body
-    ) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
+            dispatcherServlet.service(new HttpServletRequest(request), new HttpServletResponse(response));
         } catch (IOException e) {
             log.error(e.getMessage());
         }

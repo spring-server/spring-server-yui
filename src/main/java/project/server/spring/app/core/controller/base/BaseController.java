@@ -9,7 +9,7 @@ import project.server.spring.server.http.HttpMethod;
 @Controller
 public class BaseController {
 	@RequestMapping(value = "/", method = HttpMethod.GET)
-	public String welcome() {
+	public String welcome(HttpServletRequest request, HttpServletResponse response) {
 		return "index";
 	}
 }

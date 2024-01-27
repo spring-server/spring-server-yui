@@ -30,7 +30,7 @@ public class HttpHeaders {
 	public String get(String key) {
 		return headers.get(key);
 	}
-	void add(String key, String value) {
+	public void add(String key, String value) {
 		headers.put(key, value);
 	}
 
@@ -39,9 +39,19 @@ public class HttpHeaders {
 		return (value != null ? Long.parseLong(value) : -1);
 	}
 
+	public void setContentLength(long contentLength) {
+		String value = String.valueOf(contentLength);
+		add(CONTENT_LENGTH, value);
+	}
+
 	public MediaType getContentType() {
 		String value = get(CONTENT_TYPE);
 		return (MediaType.ofValue(value));
+	}
+
+	public void setContentType(MediaType mediaType) {
+		String value = mediaType.getValue();
+		add(CONTENT_TYPE, value);
 	}
 
 	public Set<String> getAllFields() {

@@ -63,4 +63,13 @@ public class RequestLine {
 	public String getQueryParamValue(String key) {
 		return queryParms.get(key);
 	}
+
+	@Override
+	public String toString() {
+		return "RequestLine{" +
+			"httpMethod=" + httpMethod +
+			", path='" + path + '\'' +
+			", queryParms=" + queryParms +
+			'}';
+	}
 }

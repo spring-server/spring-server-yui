@@ -1,18 +1,24 @@
 package project.server.spring.server.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public enum MediaType {
 	ALL("*", "*"),
 	APPLICATION_JSON("application", "json"),
 	APPLICATION_PDF ("application", "pdf"),
 	APPLICATION_FORM_URLENCODED("application", "x-www-form-urlencoded"),
+	APPLICATION_JAVASCRIPT("application", "javascript"),
 	IMAGE_GIF("image", "gif"),
 	IMAGE_JPEG("image", "jpeg"),
 	IMAGE_PNG("image", "png"),
 	MULTIPART_FORM_DATA_VALUE("multipart","form-data"),
 	TEXT_HTML("text", "html"),
-	TEXT_PLAIN("text", "plain");
+	TEXT_PLAIN("text", "plain"),
+	TEXT_CSS("text","css");
 
 	private static final String FORWARD_SLASH = "/";//TODO: parsing 관련 리팩토링
+	private static final Logger log = LoggerFactory.getLogger(MediaType.class);
 
 	private String type;
 	private String subType;
@@ -22,6 +28,9 @@ public enum MediaType {
 	}
 
 	public static MediaType ofValue(String value) {
+		if (value == null) {
+			return MediaType.ALL;
+		}
 		String[] cmds = value.split(FORWARD_SLASH);
 		if (cmds.length != 2) {
 			throw new IllegalArgumentException("invald media type value");
@@ -34,6 +43,18 @@ public enum MediaType {
 		throw new IllegalArgumentException("invalid media type value");
 	}
 
+	public static MediaType ofSubType(String subType) {
+		if (subType.equals("js")) {
+			return MediaType.APPLICATION_JAVASCRIPT;
+		}
+		for (MediaType mediaType : MediaType.values()) {
+			if (mediaType.subType.equals(subType)) {
+				return mediaType;
+			}
+		}
+		return MediaType.ALL;
+	}
+
 	public String getType() {
 		return type;
 	}
@@ -41,4 +62,7 @@ public enum MediaType {
 	public String getSubType() {
 		return subType;
 	}
+
+	public String getValue() {return type + "/" + subType;}
+
 }

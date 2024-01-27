@@ -32,14 +32,17 @@ public class HttpRequest {
 		try {
 			BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
 			RequestLine requestLine = createRequestLine(br);
+			log.info("{}", requestLine);
 			this.httpMethod = requestLine.getHttpMethod();
 			this.path = requestLine.getPath();
 			this.queryParams = requestLine.getQueryParms();
 			this.headers = createHeaders(br);
 			this.contentType = headers.getContentType();
 			log.info("data = {}", headers);
-			this.body = IOUtils.readData(br, (int) headers.getContentLength());
-			log.info("data = {}", body);
+			if (headers.getContentLength() > 0) {
+				this.body = IOUtils.readData(br, (int)headers.getContentLength());
+				log.info("data = {}", body);
+			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
