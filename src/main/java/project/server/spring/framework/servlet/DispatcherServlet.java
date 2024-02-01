@@ -63,7 +63,7 @@ public class DispatcherServlet {
 				}
 				if (request.getPath().equals(requestMapping.value()[0]) && request.getHttpMethod()
 					.equals(requestMapping.method()[0])) {
-					return (String)method.invoke(handler, request, response);// 매개변수가 있는 경우는 추가로 전달
+					return (String)method.invoke(handler, request, response); // 매개변수가 있는 경우는 추가로 전달
 				}
 			}
 		}
@@ -83,16 +83,12 @@ public class DispatcherServlet {
 	}
 
 	private static String[] parsePath(String path) {
-		String[] pathArray = path.split(DELIMETER);
-		return pathArray;
+		return path.split(DELIMETER);
 	}
 
 	private static String[] splitPath(String path) {
 		String[] paths = path.split(DELIMETER);
-		System.out.println(path);
-		System.out.println(paths.length);
-		String[] fileElements = paths[paths.length - 1].split(END_CHARCTER);
-		return fileElements;
+		return paths[paths.length - 1].split(END_CHARCTER);
 	}
 
 	private void handleStaticResource(String path, HttpServletResponse response) {

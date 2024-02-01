@@ -1,11 +1,9 @@
 package project.server.spring.server.http;
 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +21,7 @@ public class HttpRequest {
 	private String body;
 
 	private HttpHeaders headers;
-	//TODO: queryParam 클래스로 만들기
-	private Map<String, String> queryParams;
-
-
+	private QueryParams queryParams;
 
 	public HttpRequest(InputStream is) {
 		try {
@@ -40,7 +35,7 @@ public class HttpRequest {
 			this.contentType = headers.getContentType();
 			log.info("data = {}", headers);
 			if (headers.getContentLength() > 0) {
-				this.body = IOUtils.readData(br, (int)headers.getContentLength());
+				this.body = IOUtils.readData(br, headers.getContentLength());
 				log.info("data = {}", body);
 			}
 		} catch (IOException e) {
@@ -66,7 +61,7 @@ public class HttpRequest {
 		return headers;
 	}
 
-	private Long getContentLength() {
+	private int getContentLength() {
 		return headers.getContentLength();
 	}
 
@@ -94,7 +89,7 @@ public class HttpRequest {
 		return headers;
 	}
 
-	public Map<String, String> getQueryParams() {
+	public QueryParams getQueryParams() {
 		return queryParams;
 	}
 }

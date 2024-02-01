@@ -20,7 +20,6 @@ public class HttpHeaders {
 	public static final String HOST = "Host";
 	private final Map<String, String> headers = new LinkedHashMap<>();
 
-	//TODO: header 파싱 역할 분리??
 	void parse(String header) {
 		log.debug("header : {}", header);
 		HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(header);
@@ -30,13 +29,14 @@ public class HttpHeaders {
 	public String get(String key) {
 		return headers.get(key);
 	}
+
 	public void add(String key, String value) {
 		headers.put(key, value);
 	}
 
-	public long getContentLength() {
+	public int getContentLength() {
 		String value = get(CONTENT_LENGTH);
-		return (value != null ? Long.parseLong(value) : -1);
+		return (value != null ? Integer.parseInt(value) : -1);
 	}
 
 	public void setContentLength(long contentLength) {
