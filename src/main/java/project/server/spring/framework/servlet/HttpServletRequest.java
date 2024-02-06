@@ -1,55 +1,22 @@
 package project.server.spring.framework.servlet;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import project.server.spring.server.http.HttpHeaders;
 import project.server.spring.server.http.HttpMethod;
-import project.server.spring.server.http.HttpRequest;
 import project.server.spring.server.http.MediaType;
 import project.server.spring.server.http.QueryParams;
 
-public class HttpServletRequest {
-	private static final Logger log = LoggerFactory.getLogger(HttpServletRequest.class);
+public interface HttpServletRequest extends ServletRequest {
+	String getRequestURI();
 
-	private HttpMethod httpMethod;
-	private String path;
-	private MediaType contentType;
-	private String body;
-	private HttpHeaders headers;
-	//TODO: queryParam 클래스로 만들기
-	private QueryParams queryParams;
+	HttpMethod getHttpMethod();
 
-	public HttpServletRequest(HttpRequest request) {
-		this.httpMethod = request.getHttpMethod();
-		this.path = request.getPath();
-		this.contentType = request.getContentType();
-		this.body = request.getBody();
-		this.headers = request.getHeaders();
-		this.queryParams = request.getQueryParams();
-	}
+	QueryParams getQueryParams();
 
-	public HttpMethod getHttpMethod() {
-		return httpMethod;
-	}
+	String getHeader(String name);
 
-	public String getPath() {
-		return path;
-	}
+	MediaType getContentType();
 
-	public MediaType getContentType() {
-		return contentType;
-	}
+	public HttpHeaders getHeaders();
 
-	public String getBody() {
-		return body;
-	}
-
-	public HttpHeaders getHeaders() {
-		return headers;
-	}
-
-	public QueryParams getQueryParams() {
-		return queryParams;
-	}
+	public String getBody();
 }

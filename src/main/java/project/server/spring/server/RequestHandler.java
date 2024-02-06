@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import project.server.spring.framework.servlet.DispatcherServlet;
-import project.server.spring.framework.servlet.HttpServletRequest;
-import project.server.spring.framework.servlet.HttpServletResponse;
+import project.server.spring.framework.servlet.HttpServletRequestImpl;
+import project.server.spring.framework.servlet.HttpServletResponseImpl;
 import project.server.spring.server.http.HttpRequest;
 import project.server.spring.server.http.HttpResponse;
 
@@ -36,12 +36,17 @@ public final class RequestHandler extends Thread {
 			try {
 				request = new HttpRequest(in);
 			} catch (Exception e) {
-				// e.printStackTrace();
 				log.info("invalid request: {}", e.getMessage());
 				return;
 			}
 			HttpResponse response = new HttpResponse(out);
-			dispatcherServlet.service(new HttpServletRequest(request), new HttpServletResponse(response));
+			//TODO: 수정 필요
+			try {
+				dispatcherServlet.service(new HttpServletRequestImpl(request), new HttpServletResponseImpl(response));
+			} catch (Exception e) {
+				log.info("dsfsfds");
+			}
+			// dispatcherServlet.serviceTemp(new HttpServletRequestImpl(request), new HttpServletResponseImpl(response));
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}

@@ -14,14 +14,40 @@ import project.server.spring.framework.util.FileProcessor;
 import project.server.spring.server.RequestHandler;
 import project.server.spring.server.http.MediaType;
 
-public class DispatcherServlet {
+public class DispatcherServlet extends FrameworkServlet {
 	private static final DispatcherServlet SINGLE_INSTACE = new DispatcherServlet();
 
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 	private static final String DELIMETER = "/";
 	private static final String END_CHARCTER = "\\.";
 
-	public DispatcherServlet() {
+	private DispatcherServlet() {
+	}
+
+	@Override
+	protected void doService(
+		HttpServletRequest request,
+		HttpServletResponse response
+	) throws Exception {
+		doDispatch(request, response);
+	}
+
+	private void doDispatch(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			for (Object handler : ApplicationContext.getAllBeans()) {
+				String viewName = processHandler(request, response, handler.getClass(), handler);
+				if (viewName != null) {
+					FileProcessor fileProcessor = new FileProcessor();
+					byte[] buffer = fileProcessor.read(viewName + ".html");
+					response.render200(buffer, buffer.length);
+					return;
+				}
+			}
+			throw new IllegalArgumentException("handler does not exist");
+		} catch (Exception e) {
+			log.info("Exception occurs {}", e.getMessage());
+
+		}
 	}
 
 	public static DispatcherServlet getInstance() {
@@ -29,9 +55,10 @@ public class DispatcherServlet {
 	}
 
 	//TODO: model , view, view resolver 나누기
-	public void service(HttpServletRequest request, HttpServletResponse response) {
-		if (isStaticResource(request.getPath())) {
-			handleStaticResource(request.getPath(), response);
+	public void serviceTemp(HttpServletRequest request, HttpServletResponseImpl response) {
+		log.info("request : {}", request.getRequestURI());
+		if (isStaticResource(request.getRequestURI())) {
+			handleStaticResource(request.getRequestURI(), response);
 			return;
 		}
 		try {
@@ -53,7 +80,8 @@ public class DispatcherServlet {
 		}
 	}
 
-	private static String processHandler(HttpServletRequest request, HttpServletResponse response, Class<?> clazz,
+	private static String processHandler(HttpServletRequest request, HttpServletResponse response,
+		Class<?> clazz,
 		Object handler) throws IllegalAccessException, InvocationTargetException {
 		for (Method method : clazz.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(RequestMapping.class)) {
@@ -61,7 +89,7 @@ public class DispatcherServlet {
 				if (requestMapping.value().length == 0 || requestMapping.method().length == 0) {
 					continue;
 				}
-				if (request.getPath().equals(requestMapping.value()[0]) && request.getHttpMethod()
+				if (request.getRequestURI().equals(requestMapping.value()[0]) && request.getHttpMethod()
 					.equals(requestMapping.method()[0])) {
 					return (String)method.invoke(handler, request, response); // 매개변수가 있는 경우는 추가로 전달
 				}
@@ -91,7 +119,7 @@ public class DispatcherServlet {
 		return paths[paths.length - 1].split(END_CHARCTER);
 	}
 
-	private void handleStaticResource(String path, HttpServletResponse response) {
+	private void handleStaticResource(String path, HttpServletResponseImpl response) {
 		try {
 			String[] pathElements = parsePath(path);
 			String[] fileElements = pathElements[pathElements.length - 1].split(END_CHARCTER);
@@ -102,16 +130,5 @@ public class DispatcherServlet {
 		} catch (RuntimeException e) {
 			log.info("{}", e.getMessage());
 		}
-	}
-
-	private static FileFormat getFileFormat(String path) {
-		String[] fileElements = splitPath(path);
-		String extension = fileElements[1];
-		for (FileFormat file : FileFormat.values()) {
-			if (file.getExtension().equals(extension)) {
-				return file;
-			}
-		}
-		return null;
 	}
 }

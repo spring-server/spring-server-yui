@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.LinkedHashMap;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -41,15 +40,6 @@ public class HttpResponse {
 
 	public void forward(String url) {
 		try {
-			File directory = new File("./src/main/resources");
-
-			// 디렉터리 내의 모든 파일과 디렉터리 나열
-			String[] files = directory.list();
-			if (files != null) {
-				for (String file : files) {
-					System.out.println("file:" + file);
-				}
-			}
 			byte[] body = Files.readAllBytes(new File("./src/main/resources" + url).toPath());
 			if (url.endsWith(".css")) {
 				headers.add("Content-Type", "text/css");
@@ -59,27 +49,24 @@ public class HttpResponse {
 				headers.add("Content-Type", "text/html;charset=utf-8");
 			}
 			headers.add("Content-Length", body.length + "");
-			response200Header(body.length);
+			response200Header(body.length, headers.get("Content-Type"));
 			responseBody(body);
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
 	}
 
-	public void forwardBody(String body) {
+	public void forwardBody(String body) throws IOException {
 		byte[] contents = body.getBytes();
 		headers.add("Content-Type", "text/html;charset=utf-8");
 		headers.add("Content-Length", contents.length + "");
-		response200Header(contents.length);
+		response200Header(contents.length, "text/html;charset=utf-8");
 		responseBody(contents);
 	}
-	public void responseHeader(int lengthOfBodyContent) {
-		try {
-			writeResponseLine();
-			processHeaders();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
+
+	public void responseHeader(int lengthOfBodyContent) throws IOException {
+		writeResponseLine();
+		processHeaders();
 	}
 
 	private void writeResponseLine() throws IOException {
@@ -87,11 +74,11 @@ public class HttpResponse {
 		dos.writeBytes(responseLine);
 	}
 
-
-	public void response200Header(int lengthOfBodyContent) {
+	public void response200Header(int lengthOfBodyContent, String contentType) {
+		String contentTypeLine = "Content-Type: " + contentType + "\r\n";
 		try {
 			dos.writeBytes("HTTP/1.1 200 OK \r\n");
-			dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+			dos.writeBytes(contentTypeLine);
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
@@ -99,14 +86,10 @@ public class HttpResponse {
 		}
 	}
 
-	public void responseBody(byte[] body) {
-		try {
-			dos.write(body, 0, body.length);
-			dos.writeBytes("\r\n");
-			dos.flush();
-		} catch (IOException e) {
-			log.error(e.getMessage());
-		}
+	public void responseBody(byte[] body) throws IOException {
+		dos.write(body);
+		dos.writeBytes("\r\n");
+		dos.flush();
 	}
 
 	public void sendRedirect(String redirectUrl) {
@@ -141,5 +124,9 @@ public class HttpResponse {
 
 	public void setHttpStatus(HttpStatus status) {
 		this.status = status;
+	}
+
+	public OutputStream getOutputStream() {
+		return dos;
 	}
 }

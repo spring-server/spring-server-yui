@@ -1,42 +1,20 @@
 package project.server.spring.framework.servlet;
 
-import project.server.spring.server.http.HttpHeaders;
-import project.server.spring.server.http.HttpResponse;
+import java.io.IOException;
+
 import project.server.spring.server.http.HttpStatus;
 import project.server.spring.server.http.MediaType;
 
-public class HttpServletResponse {
-	private final HttpResponse response;
-	private final HttpHeaders headers;
+public interface HttpServletResponse extends ServletResponse {
 
-	public HttpServletResponse(HttpResponse response) {
-		this.response = response;
-		this.headers = new HttpHeaders();
-	}
+	void sendError(HttpStatus status);
 
-	public void render200(byte[] body, int lengthOfBodyContent) {
-		response.response200Header(lengthOfBodyContent);
-		response.responseBody(body);
-	}
+	// void setHeader(String name, String value);
 
-	public void render(byte[] body, int lengthOfBodyContent) {
-		response.responseHeader(lengthOfBodyContent);
-		response.responseBody(body);
-	}
+	//TODO: 나중에 지우기
+	public void dispatch(String path);
 
-	public void setContentType(MediaType mediaType) {
-		response.setContentType(mediaType);
-	}
+	public void render200(byte[] body, int lengthOfBodyContent) throws IOException;
 
-	public void setContentLength(long length) {
-		response.setContentLength(length);
-	}
-
-	public void setHttpStatus(HttpStatus status) {
-		response.setHttpStatus(status);
-	}
-
-	public void dispatch(String path) {
-		response.forward(path);
-	}
+	public void setContentType(MediaType mediaType);
 }

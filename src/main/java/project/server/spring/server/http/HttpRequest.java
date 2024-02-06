@@ -33,10 +33,8 @@ public class HttpRequest {
 			this.queryParams = requestLine.getQueryParms();
 			this.headers = createHeaders(br);
 			this.contentType = headers.getContentType();
-			log.info("data = {}", headers);
 			if (headers.getContentLength() > 0) {
 				this.body = IOUtils.readData(br, headers.getContentLength());
-				log.info("data = {}", body);
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -59,10 +57,6 @@ public class HttpRequest {
 			headers.parse(line);
 		}
 		return headers;
-	}
-
-	private int getContentLength() {
-		return headers.getContentLength();
 	}
 
 	public MediaType getContentType() {
