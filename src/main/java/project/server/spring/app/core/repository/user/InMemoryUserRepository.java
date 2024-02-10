@@ -16,6 +16,7 @@ public class InMemoryUserRepository implements UserRepository {
 	public InMemoryUserRepository() {
 	}
 
+	@Override
 	public User save(User user) {
 		if (isNew(user)) {
 			user.initializeId(idGenerator.incrementAndGet());
@@ -24,6 +25,7 @@ public class InMemoryUserRepository implements UserRepository {
 		return user;
 	}
 
+	@Override
 	public void delete(User user) {
 		if (isNew(user)) {
 			return;
@@ -31,18 +33,22 @@ public class InMemoryUserRepository implements UserRepository {
 		users.remove(user.getId());
 	}
 
+	@Override
 	public Optional<User> findById(Long id) {
 		return Optional.ofNullable(users.get(id));
 	}
 
+	@Override
 	public boolean existsById(Long id) {
 		return findById(id).isPresent();
 	}
 
+	@Override
 	public boolean existsByEmail(String email) {
 		return findByEmail(email).isPresent();
 	}
 
+	@Override
 	public Optional<User> findByEmail(String email) {
 		for (User user : users.values()) {
 			if (user.hasEmail(email)) {

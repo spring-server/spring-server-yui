@@ -18,7 +18,6 @@ public class UserService {
 			throw new DuplicatedUserException("email already registered");
 		}
 		User user = new User(name, password, email);
-		userRepository.test();
 		userRepository.save(user);
 		return user.getId();
 	}
