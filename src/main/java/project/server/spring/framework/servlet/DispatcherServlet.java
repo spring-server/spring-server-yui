@@ -9,10 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.context.ApplicationContext;
-import project.server.spring.framework.util.FileFormat;
+import project.server.spring.framework.servlet.handler.HandlerMethod;
 import project.server.spring.framework.util.FileProcessor;
 import project.server.spring.server.RequestHandler;
-import project.server.spring.server.http.MediaType;
 
 public class DispatcherServlet extends FrameworkServlet {
 	private static final DispatcherServlet SINGLE_INSTACE = new DispatcherServlet();
@@ -20,6 +19,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
 	private static final String DELIMETER = "/";
 	private static final String END_CHARCTER = "\\.";
+
+	private static final String REDIRECT_INDEX = "redirect:";
 
 	private DispatcherServlet() {
 	}
@@ -32,57 +33,59 @@ public class DispatcherServlet extends FrameworkServlet {
 		doDispatch(request, response);
 	}
 
-	private void doDispatch(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			for (Object handler : ApplicationContext.getAllBeans()) {
-				String viewName = processHandler(request, response, handler.getClass(), handler);
-				if (viewName != null) {
-					FileProcessor fileProcessor = new FileProcessor();
-					byte[] buffer = fileProcessor.read(viewName + ".html");
-					response.render200(buffer, buffer.length);
-					return;
-				}
-			}
-			throw new IllegalArgumentException("handler does not exist");
-		} catch (Exception e) {
-			log.info("Exception occurs {}", e.getMessage());
-
+	private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws
+		InvocationTargetException,
+		IllegalAccessException, IOException {
+		HandlerMethod handlerMethod = getHandlerMethod(request);
+		if (handlerMethod == null) {
+			//TODO: response 상태코드 설정 어디서 할지
+			throw new IllegalStateException("handler method does not exit");
 		}
+		String viewName = (String)handlerMethod.getMethod().invoke(handlerMethod.getHandler(), request, response);
+		if (viewName == null) {
+			throw new IllegalStateException("view name is null");
+		}
+		resolveView(viewName, response);
 	}
 
-	public static DispatcherServlet getInstance() {
-		return SINGLE_INSTACE;
-	}
-
-	//TODO: model , view, view resolver 나누기
-	public void serviceTemp(HttpServletRequest request, HttpServletResponseImpl response) {
-		log.info("request : {}", request.getRequestURI());
-		if (isStaticResource(request.getRequestURI())) {
-			handleStaticResource(request.getRequestURI(), response);
+	private void resolveView(String viewName, HttpServletResponse response) throws IOException {
+		if (viewName.startsWith(REDIRECT_INDEX)) {
+			String redirectUrl = viewName.substring(REDIRECT_INDEX.length());
+			response.render30x(redirectUrl);
 			return;
 		}
-		try {
-			for (Object handler : ApplicationContext.getAllBeans()) {
-				String viewName = processHandler(request, response, handler.getClass(), handler);
-				if (viewName != null) {
-					FileProcessor fileProcessor = new FileProcessor();
-					byte[] buffer = fileProcessor.read(viewName + ".html");
-					response.render200(buffer, buffer.length);
-					return;
-				}
-			}
-			throw new IllegalArgumentException("handler does not exist");
-		} catch (InvocationTargetException | IllegalAccessException e) {
-			log.info("Exception occurs {}", e.getMessage());
-		} catch (IOException e) {
-			log.info("Exception occurs {}", e.getMessage());
-			throw new IllegalArgumentException(e);
-		}
+		FileProcessor fileProcessor = new FileProcessor();
+		byte[] buffer = fileProcessor.read(getViewName(viewName));
+		response.render200(buffer, buffer.length);
 	}
 
-	private static String processHandler(HttpServletRequest request, HttpServletResponse response,
-		Class<?> clazz,
-		Object handler) throws IllegalAccessException, InvocationTargetException {
+	private String getViewName(String viewName) {
+		if (viewName.startsWith(REDIRECT_INDEX)) {
+			return viewName.substring(REDIRECT_INDEX.length()) + "";
+		}
+		return viewName + ".html";
+	}
+
+	private HandlerMethod getHandlerMethod(HttpServletRequest request) {
+		Method targetMethod = null;
+		Object tagetHandler = null;
+		for (Object handler : ApplicationContext.getAllBeans()) {
+			Method mappingMethod = getMappingMethod(handler.getClass(), request);
+			if (targetMethod != null && mappingMethod != null) {
+				throw new IllegalStateException("handler method duplicated");
+			}
+			if (mappingMethod != null) {
+				targetMethod = mappingMethod;
+				tagetHandler = handler;
+			}
+		}
+		if (targetMethod == null) {
+			return null;
+		}
+		return new HandlerMethod(tagetHandler, targetMethod);
+	}
+
+	private Method getMappingMethod(Class<?> clazz, HttpServletRequest request) {
 		for (Method method : clazz.getDeclaredMethods()) {
 			if (method.isAnnotationPresent(RequestMapping.class)) {
 				RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
@@ -91,44 +94,14 @@ public class DispatcherServlet extends FrameworkServlet {
 				}
 				if (request.getRequestURI().equals(requestMapping.value()[0]) && request.getHttpMethod()
 					.equals(requestMapping.method()[0])) {
-					return (String)method.invoke(handler, request, response); // 매개변수가 있는 경우는 추가로 전달
+					return method;
 				}
 			}
 		}
 		return null;
 	}
 
-	private boolean isStaticResource(String path) {
-		String[] pathElements = parsePath(path);
-		if (pathElements.length < 1) {
-			return false;
-		}
-		String[] fileElements = pathElements[pathElements.length - 1].split(END_CHARCTER);
-		if (pathElements.length == 1) {
-			return false;
-		}
-		return true;
-	}
-
-	private static String[] parsePath(String path) {
-		return path.split(DELIMETER);
-	}
-
-	private static String[] splitPath(String path) {
-		String[] paths = path.split(DELIMETER);
-		return paths[paths.length - 1].split(END_CHARCTER);
-	}
-
-	private void handleStaticResource(String path, HttpServletResponseImpl response) {
-		try {
-			String[] pathElements = parsePath(path);
-			String[] fileElements = pathElements[pathElements.length - 1].split(END_CHARCTER);
-			String extension = fileElements[1];
-			FileFormat fileFormat = FileFormat.ofExtension(extension);
-			response.setContentType(MediaType.ofSubType(fileFormat.getExtension()));
-			response.dispatch(path);
-		} catch (RuntimeException e) {
-			log.info("{}", e.getMessage());
-		}
+	public static DispatcherServlet getInstance() {
+		return SINGLE_INSTACE;
 	}
 }

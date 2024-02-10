@@ -4,8 +4,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,7 +21,8 @@ import project.server.spring.framework.annotation.Component;
 import project.server.spring.framework.annotation.Configuration;
 
 public class ApplicationContext {
-	private static final Map<Class<?>, Object> registeredTypeMap = new HashMap<>();
+	private static final Map<Class<?>, Object> registeredClassTypeMap = new HashMap<>();
+	private static final Map<Class<?>, List<Object>> registeredInterfaceTypeMap = new HashMap<>();
 	private static final Map<String, Object> registeredBeanMap = new HashMap<>();
 	private static Reflections reflections;
 
@@ -77,30 +80,33 @@ public class ApplicationContext {
 		Class<?> returnType = method.getReturnType();
 		if (!Modifier.isStatic(method.getModifiers()) && returnType != void.class) {
 			Object bean = method.invoke(configInstance);
-			registeredTypeMap.put(returnType, bean);
+			registeredClassTypeMap.put(returnType, bean);
 			registeredBeanMap.put(method.getName(), bean);
 		}
 	}
 
 	private void registerByBeanName(Class<?> clazz) {
-		Object instance = registeredTypeMap.get(clazz);
+		Object instance = registeredClassTypeMap.get(clazz);
 		if (instance != null) {
 			registeredBeanMap.put(clazz.getSimpleName(), instance);
 		}
 	}
 
-	private void add(Class<?> clazz) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-		if (registeredTypeMap.containsKey(clazz)) {
-			return;
+	private Object add(Class<?> clazz) throws
+		InvocationTargetException,
+		InstantiationException,
+		IllegalAccessException {
+		if (registeredClassTypeMap.containsKey(clazz)) {
+			return null;
 		}
 		if (clazz.isInterface()) {
 			addInterfaceInstance(clazz);
-			return;
+			return null;
 		}
-		addClassInstance(clazz);
+		return addClassInstance(clazz);
 	}
 
-	private void addClassInstance(Class<?> clazz) throws
+	private Object addClassInstance(Class<?> clazz) throws
 		InvocationTargetException,
 		InstantiationException,
 		IllegalAccessException {
@@ -110,13 +116,19 @@ public class ApplicationContext {
 		Object[] params = new Object[parameterTypes.length];
 		for (int index = 0; index < parameterTypes.length; index++) {
 			Class<?> parameterType = parameterTypes[index];
-			if (!registeredTypeMap.containsKey(parameterType)) {
+			if (!registeredClassTypeMap.containsKey(parameterType) && !registeredInterfaceTypeMap.containsKey(
+				parameterType)) {
 				add(parameterType);
 			}
-			params[index] = registeredTypeMap.get(parameterType);
+			if (parameterType.isInterface()) {
+				params[index] = registeredInterfaceTypeMap.get(parameterType).get(0);
+			} else {
+				params[index] = registeredClassTypeMap.get(parameterType);
+			}
 		}
 		Object instance = constructor.newInstance(params);
-		registeredTypeMap.put(clazz, instance);
+		registeredClassTypeMap.put(clazz, instance);
+		return instance;
 	}
 
 	private void addInterfaceInstance(Class<?> clazz) throws
@@ -129,7 +141,15 @@ public class ApplicationContext {
 			throw new IllegalStateException("No implementation found for interface: " + clazz.getName());
 		}
 		Class<?> subTypeClass = implementations.iterator().next();
-		add(subTypeClass);
+
+		//TODO: 수정 들어가기
+		Object subTypeInstance = add(subTypeClass);
+		List<Object> subTypeInstances = registeredInterfaceTypeMap.get(clazz);
+		if (subTypeInstances == null) {
+			subTypeInstances = new ArrayList<>();
+		}
+		subTypeInstances.add(subTypeInstance);
+		registeredInterfaceTypeMap.put(clazz, subTypeInstances);
 	}
 
 	private boolean isInstance(Class<?> clazz) {
@@ -137,7 +157,10 @@ public class ApplicationContext {
 	}
 
 	public static <T> T getBean(Class<T> clazz) {
-		return clazz.cast(registeredTypeMap.get(clazz));
+		if (clazz.isInterface()) {
+			return clazz.cast(registeredInterfaceTypeMap.get(clazz).get(0));
+		}
+		return clazz.cast(registeredClassTypeMap.get(clazz));
 	}
 
 	public static <T> T getBean(String beanName) {

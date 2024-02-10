@@ -22,9 +22,21 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 		return response.getOutputStream();
 	}
 
+	@Override
 	public void render200(byte[] body, int lengthOfBodyContent) throws IOException {
 		response.response200Header(body.length, "text/html; charset=UTF-8");
 		response.responseBody(body);
+	}
+
+	@Override
+	public void render40x(byte[] body, int lengthOfBodyContent) throws IOException {
+		response.response400Header(body.length, "text/html; charset=UTF-8");
+		response.responseBody(body);
+	}
+
+	@Override
+	public void render30x(String redirectUrl) throws IOException {
+		response.sendRedirect(redirectUrl);
 	}
 
 	public void render(byte[] body, int lengthOfBodyContent) throws IOException {
@@ -32,6 +44,7 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 		response.responseBody(body);
 	}
 
+	@Override
 	public void setContentType(MediaType mediaType) {
 		response.setContentType(mediaType);
 	}
@@ -40,10 +53,12 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 		response.setContentLength(length);
 	}
 
-	public void setHttpStatus(HttpStatus status) {
+	@Override
+	public void setStatus(HttpStatus status) {
 		response.setHttpStatus(status);
 	}
 
+	@Override
 	public void dispatch(String path) {
 		response.forward(path);
 	}
@@ -51,6 +66,5 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 	@Override
 	public void sendError(HttpStatus status) {
 		response.setHttpStatus(status);
-
 	}
 }

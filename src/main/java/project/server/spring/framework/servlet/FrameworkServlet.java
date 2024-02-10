@@ -77,7 +77,7 @@ public abstract class FrameworkServlet extends HttpServlet {
 			response.setContentType(MediaType.ofSubType(fileFormat.getExtension()));
 			response.dispatch(path);
 		} catch (RuntimeException e) {
-			log.info("{}", e.getMessage());
+			log.info("exception message : {}", e.getMessage());
 		}
 	}
 

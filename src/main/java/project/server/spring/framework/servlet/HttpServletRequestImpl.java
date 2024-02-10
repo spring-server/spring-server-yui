@@ -15,7 +15,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 	private HttpMethod httpMethod;
 	private String path;
 	private MediaType contentType;
-	private String body;
+	private char[] body;
 	private HttpHeaders headers;
 	private QueryParams queryParams;
 
@@ -47,7 +47,7 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 	}
 
 	@Override
-	public String getBody() {
+	public char[] getBody() {
 		return body;
 	}
 
@@ -68,6 +68,6 @@ public class HttpServletRequestImpl implements HttpServletRequest {
 
 	@Override
 	public int getContentLength() {
-		return body.length();
+		return body.length;
 	}
 }

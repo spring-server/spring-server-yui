@@ -12,9 +12,15 @@ public interface HttpServletResponse extends ServletResponse {
 	// void setHeader(String name, String value);
 
 	//TODO: 나중에 지우기
-	public void dispatch(String path);
+	void dispatch(String path);
 
-	public void render200(byte[] body, int lengthOfBodyContent) throws IOException;
+	void render200(byte[] body, int lengthOfBodyContent) throws IOException;
 
-	public void setContentType(MediaType mediaType);
+	void render40x(byte[] body, int lengthOfBodyContent) throws IOException;
+
+	void render30x(String redirectUrl) throws IOException;
+
+	void setContentType(MediaType mediaType);
+
+	void setStatus(HttpStatus status);
 }
