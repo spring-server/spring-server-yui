@@ -1,38 +1,21 @@
 package project.server.spring.app.core.repository.user;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 import project.server.spring.app.core.domain.user.User;
-import project.server.spring.framework.annotation.Component;
+import project.server.spring.framework.annotation.Repository;
 
-@Component
-public class UserRepository {
-	private final Map<Long, User> users;
+@Repository
+public interface UserRepository {
+	User save(User user);
 
-	public UserRepository() {
-		this.users = new ConcurrentHashMap<>();
-	}
+	void delete(User user);
 
-	public void create(User user) {
-		if (users.get(user.getId()) != null) {
-			throw new IllegalStateException("user id already exists");
-		}
-		users.put(user.getId(), user);
-	}
+	Optional<User> findById(Long id);
 
-	public void update(Long id, User user) {
-		if (users.get(id) == null) {
-			throw new IllegalStateException("user id does not exist");
-		}
-		users.put(id, user);
-	}
+	Optional<User> findByEmail(String email);
 
-	public User findById(Long id) {
-		return users.get(id);
-	}
+	boolean existsById(Long id);
 
-	void delete(Long id, User user) {
-		users.remove(id);
-	}
+	boolean existsByEmail(String email);
 }

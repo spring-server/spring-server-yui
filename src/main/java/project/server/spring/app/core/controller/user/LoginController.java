@@ -1,19 +1,20 @@
 package project.server.spring.app.core.controller.user;
 
-import project.server.spring.app.core.repository.user.UserRepository;
+import project.server.spring.app.core.service.user.UserService;
 import project.server.spring.framework.annotation.Controller;
 import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.server.http.HttpMethod;
 
 @Controller
 public class LoginController {
-	private final UserRepository userRepository;
+	private final UserService userService;
 
-	public LoginController(UserRepository userRepository) {
-		this.userRepository = userRepository;
+	public LoginController(UserService userService) {
+		this.userService = userService;
 	}
 
 	@RequestMapping(value = "/login", method = HttpMethod.POST)
-	public void login() {
+	public String login() {
+		return "redirect:/";
 	}
 }
