@@ -8,16 +8,38 @@ class RequestLineTest {
 
 	@Test
 	@DisplayName("Query Param 테스트")
-	void testQueryParam() {
+	void testQueryMultipleParams() {
 		String startLineString = "GET /users?id=130&name=euijin HTTP/1.1";
 		String expectedURI = "/users";
 		String expectedIdValue = "130";
 		String expectedNameValue = "euijin";
+		RequestLine requestLine = testRequestLine(startLineString, expectedURI);
+		Assertions.assertEquals(requestLine.getQueryParms().get("name"), expectedNameValue);
+		Assertions.assertEquals(requestLine.getQueryParms().get("id"), expectedIdValue);
+	}
+
+	@Test
+	@DisplayName("Query Param 테스트")
+	void testQueryOneParam() {
+		String startLineString = "GET /users?id=130 HTTP/1.1";
+		String expectedURI = "/users";
+		String expectedIdValue = "130";
+		RequestLine requestLine = testRequestLine(startLineString, expectedURI);
+		Assertions.assertEquals(requestLine.getQueryParms().get("id"), expectedIdValue);
+	}
+
+	private static RequestLine testRequestLine(String startLineString, String expectedURI) {
 		RequestLine requestLine = new RequestLine(startLineString);
 		Assertions.assertEquals(expectedURI, requestLine.getPath());
-		QueryParams queryParms = requestLine.getQueryParms();
-		String s = queryParms.get("name");
-		Assertions.assertEquals(queryParms.get("name"), expectedNameValue);
-		Assertions.assertEquals(queryParms.get("id"), expectedIdValue);
+		return requestLine;
+	}
+
+	@Test
+	@DisplayName("root uri 테스트")
+	void testRoot() {
+		String startLineString = "GET / HTTP/1.1";
+		String expectedURI = "/";
+		RequestLine requestLine = testRequestLine(startLineString, expectedURI);
+
 	}
 }
