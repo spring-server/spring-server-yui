@@ -41,9 +41,6 @@ public enum HttpStatus {
 
 	@Override
 	public String toString() {
-		return "HttpStatus{" +
-			"value=" + code +
-			", reasonPhrase='" + reasonPhrase + '\'' +
-			'}';
+		return String.format("code: %d, reason phrase: %s", code, reasonPhrase);
 	}
 }

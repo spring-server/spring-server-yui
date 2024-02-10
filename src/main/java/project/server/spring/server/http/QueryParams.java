@@ -8,7 +8,7 @@ public class QueryParams {
 	private final Map<String, String> queryParamsMap;
 
 	public QueryParams(String queryString) {
-		queryParamsMap = HttpRequestUtils.parseQueryString(queryString);
+		queryParamsMap = HttpRequestUtils.parseURLencodedKeyValue(queryString);
 	}
 
 	public String get(String key) {

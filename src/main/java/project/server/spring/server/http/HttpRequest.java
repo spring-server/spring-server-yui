@@ -18,7 +18,7 @@ public class HttpRequest {
 
 	private MediaType contentType;
 
-	private String body;
+	private char[] body;
 
 	private HttpHeaders headers;
 	private QueryParams queryParams;
@@ -53,7 +53,7 @@ public class HttpRequest {
 	private HttpHeaders createHeaders(BufferedReader br) throws IOException {
 		HttpHeaders headers = new HttpHeaders();
 		String line;
-		while (!(line = br.readLine()).equals("")) {
+		while (!"".equals(line = br.readLine())) {
 			headers.parse(line);
 		}
 		return headers;
@@ -75,7 +75,7 @@ public class HttpRequest {
 		return path;
 	}
 
-	public String getBody() {
+	public char[] getBody() {
 		return body;
 	}
 

@@ -6,22 +6,23 @@ import org.slf4j.LoggerFactory;
 public enum MediaType {
 	ALL("*", "*"),
 	APPLICATION_JSON("application", "json"),
-	APPLICATION_PDF ("application", "pdf"),
+	APPLICATION_PDF("application", "pdf"),
 	APPLICATION_FORM_URLENCODED("application", "x-www-form-urlencoded"),
 	APPLICATION_JAVASCRIPT("application", "javascript"),
 	IMAGE_GIF("image", "gif"),
 	IMAGE_JPEG("image", "jpeg"),
 	IMAGE_PNG("image", "png"),
-	MULTIPART_FORM_DATA_VALUE("multipart","form-data"),
+	MULTIPART_FORM_DATA_VALUE("multipart", "form-data"),
 	TEXT_HTML("text", "html"),
 	TEXT_PLAIN("text", "plain"),
-	TEXT_CSS("text","css");
+	TEXT_CSS("text", "css");
 
-	private static final String FORWARD_SLASH = "/";//TODO: parsing 관련 리팩토링
+	private static final String FORWARD_SLASH = "/"; //TODO: parsing 관련 리팩토링
 	private static final Logger log = LoggerFactory.getLogger(MediaType.class);
 
 	private String type;
 	private String subType;
+
 	private MediaType(String type, String subType) {
 		this.type = type;
 		this.subType = subType;
@@ -44,7 +45,7 @@ public enum MediaType {
 	}
 
 	public static MediaType ofSubType(String subType) {
-		if (subType.equals("js")) {
+		if ("js".equals(subType)) {
 			return MediaType.APPLICATION_JAVASCRIPT;
 		}
 		for (MediaType mediaType : MediaType.values()) {
@@ -63,6 +64,8 @@ public enum MediaType {
 		return subType;
 	}
 
-	public String getValue() {return type + "/" + subType;}
+	public String getValue() {
+		return type + "/" + subType;
+	}
 
 }

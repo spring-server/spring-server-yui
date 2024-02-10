@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import project.server.spring.framework.servlet.DispatcherServlet;
 import project.server.spring.framework.servlet.HttpServletRequestImpl;
 import project.server.spring.framework.servlet.HttpServletResponseImpl;
+import project.server.spring.framework.util.FileProcessor;
 import project.server.spring.server.http.HttpRequest;
 import project.server.spring.server.http.HttpResponse;
 
@@ -25,6 +26,7 @@ public final class RequestHandler extends Thread {
 		this.dispatcherServlet = DispatcherServlet.getInstance();
 	}
 
+	@Override
 	public void run() {
 		log.info("Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 		try (
@@ -36,6 +38,9 @@ public final class RequestHandler extends Thread {
 			try {
 				request = new HttpRequest(in);
 			} catch (Exception e) {
+				//TODO: 리팩토링 필요
+				HttpResponse errorResponse = new HttpResponse(out);
+				sendError(errorResponse);
 				log.info("invalid request: {}", e.getMessage());
 				return;
 			}
@@ -44,11 +49,18 @@ public final class RequestHandler extends Thread {
 			try {
 				dispatcherServlet.service(new HttpServletRequestImpl(request), new HttpServletResponseImpl(response));
 			} catch (Exception e) {
-				log.info("dsfsfds");
+				sendError(response);
+				log.info("exception message : {}", e.getMessage());
 			}
-			// dispatcherServlet.serviceTemp(new HttpServletRequestImpl(request), new HttpServletResponseImpl(response));
 		} catch (IOException e) {
 			log.error(e.getMessage());
 		}
+	}
+
+	private void sendError(HttpResponse response) throws IOException {
+		FileProcessor fileProcessor = new FileProcessor();
+		byte[] buffer = fileProcessor.read("400.html");
+		response.response400Header(buffer.length, "text/html; charset=UTF-8");
+		response.responseBody(buffer);
 	}
 }

@@ -12,11 +12,12 @@ import org.slf4j.LoggerFactory;
 
 public class HttpResponse {
 	private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
+	private static final String STATIC_RESOURCE_PATH = "./src/main/resources";
 	private HttpStatus status;
-	private DataOutputStream dos;
+	private DataOutputStream dos; //TODO: OutputStream 으로 바꾸기
 	private HttpHeaders headers = new HttpHeaders();
 	private String path;
-	private String protocol;//TODO: 필요하면 Protocol Enum으로 바꾸기
+	private String protocol; //TODO: 필요하면 Protocol Enum으로 바꾸기
 
 	private String body;
 
@@ -40,7 +41,7 @@ public class HttpResponse {
 
 	public void forward(String url) {
 		try {
-			byte[] body = Files.readAllBytes(new File("./src/main/resources" + url).toPath());
+			byte[] body = Files.readAllBytes(new File(STATIC_RESOURCE_PATH + url).toPath());
 			if (url.endsWith(".css")) {
 				headers.add("Content-Type", "text/css");
 			} else if (url.endsWith(".js")) {
@@ -74,10 +75,18 @@ public class HttpResponse {
 		dos.writeBytes(responseLine);
 	}
 
-	public void response200Header(int lengthOfBodyContent, String contentType) {
+	public void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
+		String contentTypeLine = "Content-Type: " + contentType + "\r\n";
+		dos.writeBytes("HTTP/1.1 200 OK \r\n");
+		dos.writeBytes(contentTypeLine);
+		dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+		dos.writeBytes("\r\n");
+	}
+
+	public void response400Header(int lengthOfBodyContent, String contentType) {
 		String contentTypeLine = "Content-Type: " + contentType + "\r\n";
 		try {
-			dos.writeBytes("HTTP/1.1 200 OK \r\n");
+			dos.writeBytes("HTTP/1.1 400 Bad Request \r\n");
 			dos.writeBytes(contentTypeLine);
 			dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
 			dos.writeBytes("\r\n");
@@ -95,7 +104,6 @@ public class HttpResponse {
 	public void sendRedirect(String redirectUrl) {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
-			processHeaders();
 			dos.writeBytes("Location: " + redirectUrl + " \r\n");
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {

@@ -21,7 +21,6 @@ public class HttpHeaders {
 	private final Map<String, String> headers = new LinkedHashMap<>();
 
 	void parse(String header) {
-		log.debug("header : {}", header);
 		HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(header);
 		add(pair.getKey(), pair.getValue());
 	}
