@@ -3,11 +3,11 @@ package project.server.spring.framework.servlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import project.server.spring.server.http.HttpHeaders;
-import project.server.spring.server.http.HttpMethod;
-import project.server.spring.server.http.HttpRequest;
-import project.server.spring.server.http.MediaType;
-import project.server.spring.server.http.QueryParams;
+import project.server.spring.framework.http.HttpHeaders;
+import project.server.spring.framework.http.HttpMethod;
+import project.server.spring.framework.http.HttpRequest;
+import project.server.spring.framework.http.MediaType;
+import project.server.spring.framework.http.QueryParams;
 
 public class HttpServletRequestImpl implements HttpServletRequest {
 	private static final Logger log = LoggerFactory.getLogger(HttpServletRequestImpl.class);

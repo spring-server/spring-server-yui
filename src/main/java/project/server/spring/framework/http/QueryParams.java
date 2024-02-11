@@ -1,8 +1,8 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import java.util.Map;
 
-import project.server.spring.server.common.utils.HttpRequestUtils;
+import project.server.spring.framework.utils.HttpRequestUtils;
 
 public class QueryParams {
 	private final Map<String, String> queryParamsMap;

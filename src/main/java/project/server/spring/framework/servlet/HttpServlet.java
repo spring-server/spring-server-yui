@@ -1,6 +1,6 @@
 package project.server.spring.framework.servlet;
 
-import project.server.spring.server.http.HttpMethod;
+import project.server.spring.framework.http.HttpMethod;
 
 public abstract class HttpServlet implements Servlet {
 	@Override

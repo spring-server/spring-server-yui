@@ -1,4 +1,4 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -7,7 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import project.server.spring.server.common.utils.HttpRequestUtils;
+import project.server.spring.framework.utils.HttpRequestUtils;
 
 public class HttpHeaders {
 

@@ -7,10 +7,10 @@ import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import project.server.spring.framework.http.HttpStatus;
 import project.server.spring.framework.servlet.HttpRequestHandler;
 import project.server.spring.framework.servlet.HttpServletRequest;
 import project.server.spring.framework.servlet.HttpServletResponse;
-import project.server.spring.server.http.HttpStatus;
 
 public class ResourceHttpRequestHandler implements HttpRequestHandler {
 	private static final ResourceHttpRequestHandler SINGLE_INSTANCE = new ResourceHttpRequestHandler();

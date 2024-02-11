@@ -3,7 +3,7 @@ package project.server.spring.app.core.controller.user;
 import project.server.spring.app.core.service.user.UserService;
 import project.server.spring.framework.annotation.Controller;
 import project.server.spring.framework.annotation.RequestMapping;
-import project.server.spring.server.http.HttpMethod;
+import project.server.spring.framework.http.HttpMethod;
 
 @Controller
 public class LoginController {

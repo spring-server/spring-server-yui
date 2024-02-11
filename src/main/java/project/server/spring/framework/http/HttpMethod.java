@@ -1,4 +1,4 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 public enum HttpMethod {
 	GET, POST, PUT, DELETE;

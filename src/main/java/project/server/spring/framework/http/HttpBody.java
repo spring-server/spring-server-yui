@@ -1,4 +1,4 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import java.util.Map;
 

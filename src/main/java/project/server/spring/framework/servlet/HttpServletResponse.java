@@ -2,8 +2,8 @@ package project.server.spring.framework.servlet;
 
 import java.io.IOException;
 
-import project.server.spring.server.http.HttpStatus;
-import project.server.spring.server.http.MediaType;
+import project.server.spring.framework.http.HttpStatus;
+import project.server.spring.framework.http.MediaType;
 
 public interface HttpServletResponse extends ServletResponse {
 

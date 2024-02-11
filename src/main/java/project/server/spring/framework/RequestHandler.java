@@ -1,4 +1,4 @@
-package project.server.spring.server;
+package project.server.spring.framework;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,12 +8,12 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import project.server.spring.framework.http.HttpRequest;
+import project.server.spring.framework.http.HttpResponse;
 import project.server.spring.framework.servlet.DispatcherServlet;
 import project.server.spring.framework.servlet.HttpServletRequestImpl;
 import project.server.spring.framework.servlet.HttpServletResponseImpl;
 import project.server.spring.framework.util.FileProcessor;
-import project.server.spring.server.http.HttpRequest;
-import project.server.spring.server.http.HttpResponse;
 
 public final class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);

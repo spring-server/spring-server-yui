@@ -6,11 +6,11 @@ import org.slf4j.LoggerFactory;
 import project.server.spring.app.core.service.user.UserService;
 import project.server.spring.framework.annotation.Controller;
 import project.server.spring.framework.annotation.RequestMapping;
+import project.server.spring.framework.http.HttpBody;
+import project.server.spring.framework.http.HttpMethod;
 import project.server.spring.framework.servlet.HttpServletRequest;
 import project.server.spring.framework.servlet.HttpServletResponse;
-import project.server.spring.server.common.utils.ObjectMapper;
-import project.server.spring.server.http.HttpBody;
-import project.server.spring.server.http.HttpMethod;
+import project.server.spring.framework.utils.ObjectMapper;
 
 @Controller
 public class UserController {

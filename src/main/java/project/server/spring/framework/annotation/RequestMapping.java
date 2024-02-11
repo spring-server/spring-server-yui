@@ -6,12 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import project.server.spring.server.http.HttpMethod;
+import project.server.spring.framework.http.HttpMethod;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface RequestMapping {
 	String[] value() default {};
+
 	HttpMethod[] method() default {};
 }

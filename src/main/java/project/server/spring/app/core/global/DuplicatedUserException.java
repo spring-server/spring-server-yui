@@ -1,6 +1,6 @@
 package project.server.spring.app.core.global;
 
-import project.server.spring.server.http.HttpStatus;
+import project.server.spring.framework.http.HttpStatus;
 
 public class DuplicatedUserException extends BusinessException {
 	public DuplicatedUserException(String message) {

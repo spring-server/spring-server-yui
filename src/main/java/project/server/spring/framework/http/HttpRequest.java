@@ -1,4 +1,4 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import project.server.spring.server.common.utils.IOUtils;
+import project.server.spring.framework.utils.IOUtils;
 
 public class HttpRequest {
 	private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);

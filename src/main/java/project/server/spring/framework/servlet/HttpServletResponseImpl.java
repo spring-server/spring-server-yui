@@ -3,10 +3,10 @@ package project.server.spring.framework.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import project.server.spring.server.http.HttpHeaders;
-import project.server.spring.server.http.HttpResponse;
-import project.server.spring.server.http.HttpStatus;
-import project.server.spring.server.http.MediaType;
+import project.server.spring.framework.http.HttpHeaders;
+import project.server.spring.framework.http.HttpResponse;
+import project.server.spring.framework.http.HttpStatus;
+import project.server.spring.framework.http.MediaType;
 
 public class HttpServletResponseImpl implements HttpServletResponse {
 	private final HttpResponse response;

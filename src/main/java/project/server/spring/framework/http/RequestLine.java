@@ -1,9 +1,9 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import project.server.spring.server.common.utils.HttpRequestUtils;
+import project.server.spring.framework.utils.HttpRequestUtils;
 
 public class RequestLine {
 	private static final String SPACE = " ";

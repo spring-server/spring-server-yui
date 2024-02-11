@@ -2,9 +2,9 @@ package project.server.spring.app.core.controller.base;
 
 import project.server.spring.framework.annotation.Controller;
 import project.server.spring.framework.annotation.RequestMapping;
+import project.server.spring.framework.http.HttpMethod;
 import project.server.spring.framework.servlet.HttpServletRequestImpl;
 import project.server.spring.framework.servlet.HttpServletResponseImpl;
-import project.server.spring.server.http.HttpMethod;
 
 @Controller
 public class BaseController {

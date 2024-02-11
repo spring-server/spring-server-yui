@@ -1,4 +1,4 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

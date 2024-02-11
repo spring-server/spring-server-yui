@@ -1,8 +1,8 @@
 package project.server.spring.framework.servlet;
 
-import project.server.spring.server.http.HttpHeaders;
-import project.server.spring.server.http.HttpMethod;
-import project.server.spring.server.http.QueryParams;
+import project.server.spring.framework.http.HttpHeaders;
+import project.server.spring.framework.http.HttpMethod;
+import project.server.spring.framework.http.QueryParams;
 
 public interface HttpServletRequest extends ServletRequest {
 	String getRequestURI();

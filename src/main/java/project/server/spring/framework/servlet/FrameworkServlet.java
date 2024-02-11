@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import project.server.spring.framework.http.MediaType;
 import project.server.spring.framework.util.FileFormat;
-import project.server.spring.server.http.MediaType;
 
 public abstract class FrameworkServlet extends HttpServlet {
 	private static final Logger log = LoggerFactory.getLogger(FrameworkServlet.class);
