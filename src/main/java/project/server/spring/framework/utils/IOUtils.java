@@ -1,4 +1,4 @@
-package project.server.spring.server.common.utils;
+package project.server.spring.framework.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

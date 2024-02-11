@@ -1,4 +1,4 @@
-package project.server.spring.server.common.utils;
+package project.server.spring.framework.utils;
 
 import java.util.Arrays;
 import java.util.Map;

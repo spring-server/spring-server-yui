@@ -1,11 +1,11 @@
-package project.server.spring.server.common.utils;
+package project.server.spring.framework.utils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
-import project.server.spring.server.http.HttpBody;
-import project.server.spring.server.http.MediaType;
+import project.server.spring.framework.http.HttpBody;
+import project.server.spring.framework.http.MediaType;
 
 public class ObjectMapper {
 	public static HttpBody readValue(char[] rawbody, MediaType mediaType) {
