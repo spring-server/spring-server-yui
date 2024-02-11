@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import project.server.spring.server.RequestHandler;
+import project.server.spring.framework.RequestHandler;
 
 public class FileProcessor {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
