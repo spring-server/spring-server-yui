@@ -1,4 +1,4 @@
-package project.server.spring.server.http;
+package project.server.spring.framework.http;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -14,8 +14,8 @@ class RequestLineTest {
 		String expectedIdValue = "130";
 		String expectedNameValue = "euijin";
 		RequestLine requestLine = testRequestLine(startLineString, expectedURI);
-		Assertions.assertEquals(requestLine.getQueryParms().get("name"), expectedNameValue);
-		Assertions.assertEquals(requestLine.getQueryParms().get("id"), expectedIdValue);
+		Assertions.assertEquals(expectedNameValue, requestLine.getQueryParms().get("name"));
+		Assertions.assertEquals(expectedIdValue, requestLine.getQueryParms().get("id"));
 	}
 
 	@Test
@@ -25,7 +25,7 @@ class RequestLineTest {
 		String expectedURI = "/users";
 		String expectedIdValue = "130";
 		RequestLine requestLine = testRequestLine(startLineString, expectedURI);
-		Assertions.assertEquals(requestLine.getQueryParms().get("id"), expectedIdValue);
+		Assertions.assertEquals(expectedIdValue, requestLine.getQueryParms().get("id"));
 	}
 
 	private static RequestLine testRequestLine(String startLineString, String expectedURI) {
@@ -40,6 +40,5 @@ class RequestLineTest {
 		String startLineString = "GET / HTTP/1.1";
 		String expectedURI = "/";
 		RequestLine requestLine = testRequestLine(startLineString, expectedURI);
-
 	}
 }
