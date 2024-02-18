@@ -26,18 +26,14 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/sign-up", method = HttpMethod.POST)
-	public String signIn(HttpServletRequest request, HttpServletResponse response) {
+	public String signUp(HttpServletRequest request, HttpServletResponse response) {
 		HttpBody httpBody = ObjectMapper.readValue(request.getBody(), request.getContentType());
+		assert httpBody != null;
 		String name = httpBody.get(NAME_KEY);
 		String email = httpBody.get(EMAIL_KEY);
 		String password = httpBody.get(PASSWORD_KEY);
 		userService.add(name, email, password);
 		return "redirect:/";
-	}
-
-	@RequestMapping(value = "/sign-up", method = HttpMethod.GET)
-	public String signUp(HttpServletRequest request, HttpServletResponse response) {
-		return "sign-up";
 	}
 
 }
