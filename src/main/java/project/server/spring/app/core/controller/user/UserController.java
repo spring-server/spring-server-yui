@@ -35,5 +35,4 @@ public class UserController {
 		userService.add(name, email, password);
 		return "redirect:/";
 	}
-
 }
