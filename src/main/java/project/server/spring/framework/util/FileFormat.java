@@ -4,7 +4,8 @@ public enum FileFormat {
 	JPEG("image", "jpg"),
 	PNG("image", "png"),
 	CSS("stylesheet", "css"),
-	JS("script", "js");
+	JS("script", "js"),
+	ICO("ico", "ico");
 
 	private final String type;
 	private final String extension;

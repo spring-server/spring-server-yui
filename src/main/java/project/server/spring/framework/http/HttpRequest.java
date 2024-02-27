@@ -35,6 +35,7 @@ public class HttpRequest {
 			this.contentType = headers.getContentType();
 			if (headers.getContentLength() > 0) {
 				this.body = IOUtils.readData(br, headers.getContentLength());
+				log.info("body :{}", body);
 			}
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -85,5 +86,9 @@ public class HttpRequest {
 
 	public QueryParams getQueryParams() {
 		return queryParams;
+	}
+
+	public Cookies getCookies() {
+		return headers.getCookies();
 	}
 }

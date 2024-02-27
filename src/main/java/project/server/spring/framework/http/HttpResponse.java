@@ -46,11 +46,14 @@ public class HttpResponse {
 				headers.add("Content-Type", "text/css");
 			} else if (url.endsWith(".js")) {
 				headers.add("Content-Type", "application/javascript");
+			} else if (url.endsWith(".ico")) {
+				headers.add("Content-Type", "image/x-icon");
 			} else {
 				headers.add("Content-Type", "text/html;charset=utf-8");
 			}
+
 			headers.add("Content-Length", body.length + "");
-			response200Header(body.length, headers.get("Content-Type"));
+			response200Header(body.length, headers.get("Content-Type"), null);
 			responseBody(body);
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -61,7 +64,7 @@ public class HttpResponse {
 		byte[] contents = body.getBytes();
 		headers.add("Content-Type", "text/html;charset=utf-8");
 		headers.add("Content-Length", contents.length + "");
-		response200Header(contents.length, "text/html;charset=utf-8");
+		response200Header(contents.length, "text/html;charset=utf-8", null);
 		responseBody(contents);
 	}
 
@@ -75,11 +78,16 @@ public class HttpResponse {
 		dos.writeBytes(responseLine);
 	}
 
-	public void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
+	public void response200Header(int lengthOfBodyContent, String contentType, Cookies cookies) throws IOException {
 		String contentTypeLine = "Content-Type: " + contentType + "\r\n";
 		dos.writeBytes("HTTP/1.1 200 OK \r\n");
 		dos.writeBytes(contentTypeLine);
 		dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+		sendCookies(cookies);
+		dos.writeBytes("\r\n");
+	}
+
+	public void responseHeaderEnd() throws IOException {
 		dos.writeBytes("\r\n");
 	}
 
@@ -101,10 +109,11 @@ public class HttpResponse {
 		dos.flush();
 	}
 
-	public void sendRedirect(String redirectUrl) {
+	public void sendRedirect(String redirectUrl, Cookies cookies) {
 		try {
 			dos.writeBytes("HTTP/1.1 302 Found \r\n");
 			dos.writeBytes("Location: " + redirectUrl + " \r\n");
+			sendCookies(cookies);
 			dos.writeBytes("\r\n");
 		} catch (IOException e) {
 			log.error(e.getMessage());
@@ -136,5 +145,18 @@ public class HttpResponse {
 
 	public OutputStream getOutputStream() {
 		return dos;
+	}
+
+	public void sendCookies(Cookies cookies) {
+		if (cookies == null) {
+			return;
+		}
+		try {
+			for (String key : cookies.getAllKeys()) {
+				dos.writeBytes("Set-Cookie: " + key + "=" + cookies.get(key) + "\r\n");
+			}
+		} catch (IOException e) {
+			log.info(e.getMessage());
+		}
 	}
 }

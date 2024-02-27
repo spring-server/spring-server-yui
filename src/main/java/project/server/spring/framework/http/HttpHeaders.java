@@ -17,12 +17,19 @@ public class HttpHeaders {
 	public static final String AUTHORIZATION = "Authorization";
 	public static final String CONNECTION = "Connection";
 	public static final String COOKIE = "Cookie";
+	public static final String SET_COOKIE = "Set-Cookie";
 	public static final String HOST = "Host";
 	private final Map<String, String> headers = new LinkedHashMap<>();
+	private static final String EQUIVALENCE = "=";
+	private static final String AND_INDEX = "; ";
+	private Cookies cookies = null;
 
 	void parse(String header) {
 		HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(header);
 		add(pair.getKey(), pair.getValue());
+		if (COOKIE.equals(pair.getKey())) {
+			cookies = Cookies.create(pair.getValue());
+		}
 	}
 
 	public String get(String key) {
@@ -45,7 +52,7 @@ public class HttpHeaders {
 
 	public MediaType getContentType() {
 		String value = get(CONTENT_TYPE);
-		return (MediaType.ofValue(value));
+		return MediaType.ofValue(value);
 	}
 
 	public void setContentType(MediaType mediaType) {
@@ -55,5 +62,17 @@ public class HttpHeaders {
 
 	public Set<String> getAllFields() {
 		return headers.keySet();
+	}
+
+	public Cookies getCookies() {
+		return cookies;
+	}
+
+	public void sendCookie(Cookies cookies) {
+		for (String key : cookies.getAllKeys()) {
+			String value = cookies.get(key);
+			String headerValue = key + EQUIVALENCE + value;
+			headers.put(SET_COOKIE, headerValue);
+		}
 	}
 }
