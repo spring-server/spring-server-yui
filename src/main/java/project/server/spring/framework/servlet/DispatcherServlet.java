@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import project.server.spring.framework.RequestHandler;
 import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.context.ApplicationContext;
+import project.server.spring.framework.http.Cookies;
+import project.server.spring.framework.http.HttpSession;
 import project.server.spring.framework.servlet.handler.HandlerMethod;
 import project.server.spring.framework.util.FileProcessor;
 
@@ -42,10 +44,20 @@ public class DispatcherServlet extends FrameworkServlet {
 			throw new IllegalStateException("handler method does not exit");
 		}
 		String viewName = (String)handlerMethod.getMethod().invoke(handlerMethod.getHandler(), request, response);
+		//TODO: 세션 처리해주는 로직 어떻게 분리할지
+		handleSession(request, response);
 		if (viewName == null) {
 			throw new IllegalStateException("view name is null");
 		}
 		resolveView(viewName, response);
+	}
+
+	private void handleSession(HttpServletRequest request, HttpServletResponse response) {
+		HttpSession session = request.getSession();
+		if (session != null && session.getId() != null) {
+			String sessionId = session.getId();
+			response.addCookie(Cookies.create("session_id", sessionId));
+		}
 	}
 
 	private void resolveView(String viewName, HttpServletResponse response) throws IOException {

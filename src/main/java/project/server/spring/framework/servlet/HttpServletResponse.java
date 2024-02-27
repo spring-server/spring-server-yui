@@ -2,10 +2,13 @@ package project.server.spring.framework.servlet;
 
 import java.io.IOException;
 
+import project.server.spring.framework.http.Cookies;
 import project.server.spring.framework.http.HttpStatus;
 import project.server.spring.framework.http.MediaType;
 
 public interface HttpServletResponse extends ServletResponse {
+
+	void addCookie(Cookies cookies);
 
 	void sendError(HttpStatus status);
 

@@ -3,6 +3,7 @@ package project.server.spring.framework.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import project.server.spring.framework.http.Cookies;
 import project.server.spring.framework.http.HttpHeaders;
 import project.server.spring.framework.http.HttpResponse;
 import project.server.spring.framework.http.HttpStatus;
@@ -12,9 +13,12 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 	private final HttpResponse response;
 	private final HttpHeaders headers;
 
+	private Cookies cookies;
+
 	public HttpServletResponseImpl(HttpResponse response) {
 		this.response = response;
 		this.headers = new HttpHeaders();
+		this.cookies = null;
 	}
 
 	@Override
@@ -24,7 +28,7 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 
 	@Override
 	public void render200(byte[] body, int lengthOfBodyContent) throws IOException {
-		response.response200Header(body.length, "text/html; charset=UTF-8");
+		response.response200Header(body.length, "text/html; charset=UTF-8", cookies);
 		response.responseBody(body);
 	}
 
@@ -36,7 +40,7 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 
 	@Override
 	public void render30x(String redirectUrl) throws IOException {
-		response.sendRedirect(redirectUrl);
+		response.sendRedirect(redirectUrl, cookies);
 	}
 
 	public void render(byte[] body, int lengthOfBodyContent) throws IOException {
@@ -66,5 +70,10 @@ public class HttpServletResponseImpl implements HttpServletResponse {
 	@Override
 	public void sendError(HttpStatus status) {
 		response.setHttpStatus(status);
+	}
+
+	@Override
+	public void addCookie(Cookies cookies) {
+		this.cookies = cookies;
 	}
 }

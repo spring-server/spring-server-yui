@@ -38,7 +38,7 @@ public final class RequestHandler extends Thread {
 			try {
 				request = new HttpRequest(in);
 			} catch (Exception e) {
-				//TODO: 리팩토링 필요
+				//TODO: 리팩토링 필요, 쿠키 수정하기
 				HttpResponse errorResponse = new HttpResponse(out);
 				sendError(errorResponse);
 				log.info("invalid request: {}", e.getMessage());
