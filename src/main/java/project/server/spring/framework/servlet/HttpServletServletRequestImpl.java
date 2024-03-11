@@ -15,7 +15,7 @@ import project.server.spring.framework.http.QueryParams;
 import project.server.spring.framework.http.Session;
 import project.server.spring.framework.http.SessionStore;
 
-public class HttpServletRequestImpl implements HttpServletRequest {
+public class HttpServletRequestImpl implements AsyncHttpRequest {
 	private static final Logger log = LoggerFactory.getLogger(HttpServletRequestImpl.class);
 
 	private HttpMethod httpMethod;
