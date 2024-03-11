@@ -41,6 +41,7 @@ public class HttpResponse {
 
 	public void forward(String url) {
 		try {
+			log.info(STATIC_RESOURCE_PATH + url);
 			byte[] body = Files.readAllBytes(new File(STATIC_RESOURCE_PATH + url).toPath());
 			if (url.endsWith(".css")) {
 				headers.add("Content-Type", "text/css");

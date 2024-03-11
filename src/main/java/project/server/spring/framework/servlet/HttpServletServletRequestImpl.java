@@ -15,8 +15,8 @@ import project.server.spring.framework.http.QueryParams;
 import project.server.spring.framework.http.Session;
 import project.server.spring.framework.http.SessionStore;
 
-public class HttpServletRequestImpl implements AsyncHttpRequest {
-	private static final Logger log = LoggerFactory.getLogger(HttpServletRequestImpl.class);
+public class HttpServletServletRequestImpl implements HttpServletRequest {
+	private static final Logger log = LoggerFactory.getLogger(HttpServletServletRequestImpl.class);
 
 	private HttpMethod httpMethod;
 	private String path;
@@ -33,7 +33,7 @@ public class HttpServletRequestImpl implements AsyncHttpRequest {
 		return path;
 	}
 
-	public HttpServletRequestImpl(HttpRequest request) {
+	public HttpServletServletRequestImpl(HttpRequest request) {
 		this.httpMethod = request.getHttpMethod();
 		this.path = request.getPath();
 		this.contentType = request.getContentType();

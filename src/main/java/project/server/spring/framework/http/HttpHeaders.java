@@ -75,4 +75,14 @@ public class HttpHeaders {
 			headers.put(SET_COOKIE, headerValue);
 		}
 	}
+
+	public boolean contains(String name) {
+		return headers.get(name) != null;
+	}
+
+	// public String makeLine() {
+	// 	for (String headerField : headers.keySet()) {
+	//
+	// 	}
+	// }
 }

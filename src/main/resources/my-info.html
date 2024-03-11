@@ -97,7 +97,7 @@
     }, false);
 
     window.addEventListener('DOMContentLoaded', (event) => {
-        fetch('http://localhost:8086/my-info.html')
+        fetch('http://localhost:8083/profile')
             .then(response => {
                 if (response.status === 301) {
                     window.location.href = '/';

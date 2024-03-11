@@ -36,3 +36,12 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+//yml 다운로드
+//task downloadYml {
+//    doLast {
+//        def url = new URL('https://rb.gy/bw8syz')
+//        def file = project.file("src/main/resources/application.yml")
+//        file.text = url.text
+//    }
+//}

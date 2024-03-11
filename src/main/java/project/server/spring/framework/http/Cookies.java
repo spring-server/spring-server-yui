@@ -26,6 +26,10 @@ public class Cookies {
 		return new Cookies(cookieMap);
 	}
 
+	public static Cookies empty() {
+		return new Cookies(new HashMap<>());
+	}
+
 	public String get(String key) {
 		if (key == null) {
 			throw new IllegalArgumentException("cookie key is not found");

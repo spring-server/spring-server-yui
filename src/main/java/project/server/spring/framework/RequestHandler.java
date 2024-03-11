@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import project.server.spring.framework.http.HttpRequest;
 import project.server.spring.framework.http.HttpResponse;
 import project.server.spring.framework.servlet.DispatcherServlet;
-import project.server.spring.framework.servlet.HttpServletRequestImpl;
 import project.server.spring.framework.servlet.HttpServletResponseImpl;
+import project.server.spring.framework.servlet.HttpServletServletRequestImpl;
 import project.server.spring.framework.util.FileProcessor;
 
 public final class RequestHandler extends Thread {
@@ -47,7 +47,8 @@ public final class RequestHandler extends Thread {
 			HttpResponse response = new HttpResponse(out);
 			//TODO: 수정 필요
 			try {
-				dispatcherServlet.service(new HttpServletRequestImpl(request), new HttpServletResponseImpl(response));
+				dispatcherServlet.service(new HttpServletServletRequestImpl(request),
+					new HttpServletResponseImpl(response));
 			} catch (Exception e) {
 				sendError(response);
 				log.info("exception message : {}", e.getMessage());

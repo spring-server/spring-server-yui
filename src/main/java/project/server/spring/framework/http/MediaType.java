@@ -9,6 +9,7 @@ public enum MediaType {
 	APPLICATION_PDF("application", "pdf"),
 	APPLICATION_FORM_URLENCODED("application", "x-www-form-urlencoded"),
 	APPLICATION_JAVASCRIPT("application", "javascript"),
+	APPLICATION_OCTET_STREAM("application", "octet-stream"),
 	IMAGE_GIF("image", "gif"),
 	IMAGE_JPEG("image", "jpeg"),
 	IMAGE_PNG("image", "png"),

@@ -7,7 +7,6 @@ import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import project.server.spring.framework.RequestHandler;
 import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.context.ApplicationContext;
 import project.server.spring.framework.http.Cookies;
@@ -18,7 +17,7 @@ import project.server.spring.framework.util.FileProcessor;
 public class DispatcherServlet extends FrameworkServlet {
 	private static final DispatcherServlet SINGLE_INSTACE = new DispatcherServlet();
 
-	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(DispatcherServlet.class);
 	private static final String DELIMETER = "/";
 	private static final String END_CHARCTER = "\\.";
 
@@ -75,6 +74,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		if (viewName.startsWith(REDIRECT_INDEX)) {
 			return viewName.substring(REDIRECT_INDEX.length()) + "";
 		}
+		log.info(viewName);
 		return viewName + ".html";
 	}
 
