@@ -11,9 +11,9 @@ public class UserInfoDto {
 	private final String phoneNumber;
 
 	public UserInfoDto(User user) {
-		this.name = user.getName().value();
-		this.email = user.getEmail().emailAddress();
-		this.password = user.getPassword().value();
+		this.name = user.getName();
+		this.email = user.getEmail();
+		this.password = user.getMaskingPassword();
 		this.phoneNumber = "010-0000-0000";
 	}
 

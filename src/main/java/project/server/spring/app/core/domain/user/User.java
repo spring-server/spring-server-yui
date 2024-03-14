@@ -6,6 +6,8 @@ import project.server.spring.app.core.global.exception.AuthenticationException;
 import project.server.spring.app.core.global.exception.DuplicatedUserException;
 
 public class User {
+	private static final String EMPTY_STRING = "";
+	private static final String MASKING = "*";
 	private Long id;
 	private Name name;
 	private Password password;
@@ -22,16 +24,33 @@ public class User {
 		return id;
 	}
 
-	public Name getName() {
-		return name;
+	public String getName() {
+		if (this.name != null) {
+			return name.value();
+		}
+		return EMPTY_STRING;
 	}
 
-	public Password getPassword() {
-		return password;
+	public String getPassword() {
+		if (this.password != null) {
+			return password.value();
+		}
+		return EMPTY_STRING;
 	}
 
-	public Email getEmail() {
-		return email;
+	public String getMaskingPassword() {
+		if (this.password != null) {
+			int length = password.getLength();
+			return MASKING.repeat(length);
+		}
+		return EMPTY_STRING;
+	}
+
+	public String getEmail() {
+		if (this.email != null) {
+			return email.emailAddress();
+		}
+		return EMPTY_STRING;
 	}
 
 	@Override

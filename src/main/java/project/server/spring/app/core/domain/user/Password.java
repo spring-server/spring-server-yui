@@ -30,8 +30,7 @@ public record Password(String value) {
 		return this.value.equals(value);
 	}
 
-	@Override
-	public String value() {
-		return "***********";
+	public int getLength() {
+		return value.length();
 	}
 }
