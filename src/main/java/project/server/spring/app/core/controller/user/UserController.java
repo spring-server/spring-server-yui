@@ -52,7 +52,6 @@ public class UserController {
 
 	@RequestMapping(value = "/profile", method = HttpMethod.PUT)
 	public ModelAndView updateUserInfo(HttpServletRequest request, HttpServletResponse response) {
-		log.info("jkjkjl");
 		return new ModelAndView("redirect:/");
 	}
 }

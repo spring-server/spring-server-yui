@@ -37,7 +37,6 @@ public final class RequestHandler extends Thread {
 			//TODO: 리팩토링 필요
 			try {
 				request = new SyncHttpRequest(in);
-				log.info("check");
 				response = new SyncHttpResponse(out);
 				log.info(request.getRequestURI());
 				try {
