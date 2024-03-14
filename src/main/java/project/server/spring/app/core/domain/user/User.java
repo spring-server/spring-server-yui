@@ -2,7 +2,8 @@ package project.server.spring.app.core.domain.user;
 
 import java.util.Objects;
 
-import project.server.spring.app.core.global.DuplicatedUserException;
+import project.server.spring.app.core.global.exception.AuthenticationException;
+import project.server.spring.app.core.global.exception.DuplicatedUserException;
 
 public class User {
 	private Long id;
@@ -67,5 +68,11 @@ public class User {
 
 	public boolean hasEmail(String email) {
 		return this.email.isSame(email);
+	}
+
+	public void validatePassword(String password) {
+		if (!this.password.match(password)) {
+			throw new AuthenticationException("invalid password");
+		}
 	}
 }

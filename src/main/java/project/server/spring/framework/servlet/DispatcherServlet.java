@@ -3,6 +3,7 @@ package project.server.spring.framework.servlet;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,10 +11,10 @@ import org.slf4j.LoggerFactory;
 import project.server.spring.framework.RequestHandler;
 import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.context.ApplicationContext;
-import project.server.spring.framework.http.Cookies;
+import project.server.spring.framework.http.Cookie;
 import project.server.spring.framework.http.HttpSession;
 import project.server.spring.framework.servlet.handler.HandlerMethod;
-import project.server.spring.framework.util.FileProcessor;
+import project.server.spring.framework.util.PageProcessor;
 
 public class DispatcherServlet extends FrameworkServlet {
 	private static final DispatcherServlet SINGLE_INSTACE = new DispatcherServlet();
@@ -43,32 +44,51 @@ public class DispatcherServlet extends FrameworkServlet {
 			//TODO: response 상태코드 설정 어디서 할지
 			throw new IllegalStateException("handler method does not exit");
 		}
-		String viewName = (String)handlerMethod.getMethod().invoke(handlerMethod.getHandler(), request, response);
+		ModelAndView modelAndView = (ModelAndView)handlerMethod.getMethod()
+			.invoke(handlerMethod.getHandler(), request, response);
 		//TODO: 세션 처리해주는 로직 어떻게 분리할지
 		handleSession(request, response);
-		if (viewName == null) {
+		if (modelAndView.getView() == null) {
 			throw new IllegalStateException("view name is null");
 		}
-		resolveView(viewName, response);
+		resolveView(modelAndView, response);
 	}
 
 	private void handleSession(HttpServletRequest request, HttpServletResponse response) {
-		HttpSession session = request.getSession();
+		HttpSession session = null;
+		try {
+			session = request.getSession();
+		} catch (Exception e) {
+			Cookie sessionCookie = Cookie.createSessionCookie("");
+			sessionCookie.setMaxAge(0);
+			response.addCookie(sessionCookie);
+		}
 		if (session != null && session.getId() != null) {
 			String sessionId = session.getId();
-			response.addCookie(Cookies.create("session_id", sessionId));
+			Cookie cookie = Cookie.createSessionCookie(sessionId);
+			cookie.setHttpOnly(true);
+			cookie.setMaxAge(600);
+			response.addCookie(cookie);
+		} else {
+			log.info("check");
 		}
 	}
 
-	private void resolveView(String viewName, HttpServletResponse response) throws IOException {
+	private void resolveView(ModelAndView modelAndView, HttpServletResponse response) throws IOException {
+		String viewName = modelAndView.getView();
 		if (viewName.startsWith(REDIRECT_INDEX)) {
 			String redirectUrl = viewName.substring(REDIRECT_INDEX.length());
-			response.render30x(redirectUrl);
+			response.sendRedirect(redirectUrl);
 			return;
 		}
-		FileProcessor fileProcessor = new FileProcessor();
-		byte[] buffer = fileProcessor.read(getViewName(viewName));
-		response.render200(buffer, buffer.length);
+		PageProcessor pageProcessor = new PageProcessor();
+		String page = pageProcessor.read(getViewName(viewName));
+		if (modelAndView.hasModelMap()) {
+			page = pageProcessor.changeAttributes(modelAndView, page);
+		}
+		response.setContentType("text/html;charset=utf-8");
+		response.setStatus(200);
+		response.flush(page.getBytes(StandardCharsets.UTF_8));
 	}
 
 	private String getViewName(String viewName) {

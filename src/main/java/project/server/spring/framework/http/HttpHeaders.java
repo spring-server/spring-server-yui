@@ -1,6 +1,8 @@
 package project.server.spring.framework.http;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,13 +24,13 @@ public class HttpHeaders {
 	private final Map<String, String> headers = new LinkedHashMap<>();
 	private static final String EQUIVALENCE = "=";
 	private static final String AND_INDEX = "; ";
-	private Cookies cookies = null;
+	private List<Cookie> cookies = new ArrayList<>();
 
 	void parse(String header) {
 		HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(header);
 		add(pair.getKey(), pair.getValue());
 		if (COOKIE.equals(pair.getKey())) {
-			cookies = Cookies.create(pair.getValue());
+			cookies = HttpRequestUtils.makeCookies(pair.getValue());
 		}
 	}
 
@@ -64,15 +66,11 @@ public class HttpHeaders {
 		return headers.keySet();
 	}
 
-	public Cookies getCookies() {
+	public List<Cookie> getCookies() {
 		return cookies;
 	}
 
-	public void sendCookie(Cookies cookies) {
-		for (String key : cookies.getAllKeys()) {
-			String value = cookies.get(key);
-			String headerValue = key + EQUIVALENCE + value;
-			headers.put(SET_COOKIE, headerValue);
-		}
+	public boolean contains(String name) {
+		return headers.get(name) != null;
 	}
 }

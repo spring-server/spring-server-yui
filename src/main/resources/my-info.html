@@ -40,14 +40,15 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="username">ID</label>
-                        <input type="text" class="form-control" id="username" placeholder="" value="*" required>
+                        <input type="text" class="form-control" id="username" placeholder="$name" required>
                         <div class="invalid-feedback">
                             ID를 입력해주세요.
                         </div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="password">패스워드</label>
-                        <input type="password" class="form-control" id="password" placeholder="" value="\" required>
+                        <input type="password" class="form-control" id="password" placeholder="$password"
+                               required>
                         <div class="invalid-feedback">
                             비밀번호를 입력해주세요.
                         </div>
@@ -55,14 +56,14 @@
                 </div>
                 <div class="mb-3">
                     <label for="email">이메일</label>
-                    <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+                    <input type="email" class="form-control" id="email" placeholder="$email" required>
                     <div class="invalid-feedback">
                         이메일을 입력해주세요.
                     </div>
                 </div>
                 <div class="mb-3">
                     <label for="address">핸드폰 번호<span class="text-muted">&nbsp;(필수 아님)</span></label>
-                    <input type="text" class="form-control" id="address" placeholder="010-1111-1111" required>
+                    <input type="text" class="form-control" id="address" placeholder="$phoneNumber" required>
                     <div class="invalid-feedback">
                         핸드폰 번호를 입력해주세요.
                     </div>
@@ -73,7 +74,7 @@
                     <label class="custom-control-label" for="aggrement">개인정보 수집 및 이용에 동의합니다.</label>
                 </div>
                 <div class="mb-4"></div>
-                <button class="btn btn-primary btn-lg btn-block" type="submit">수정</button>
+                <button class="btn btn-primary btn-lg btn-block" type="button" onclick="submitForm()">수정</button>
             </form>
         </div>
     </div>
@@ -107,7 +108,34 @@
                 console.error('Error:', error);
             });
     });
+
+    function submitForm() {
+        const formData = {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            email: document.getElementById('email').value,
+            phoneNumber: document.getElementById('address').value
+        };
+
+        fetch('http://localhost:8083/profile', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Redirect to another page or show success message
+                window.location.href = '/';
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+    }
 </script>
 </body>
 
 </html>
+

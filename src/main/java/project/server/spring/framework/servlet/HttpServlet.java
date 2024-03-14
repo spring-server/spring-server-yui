@@ -35,6 +35,7 @@ public abstract class HttpServlet implements Servlet {
 			doPost(request, response);
 			return;
 		}
+
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws Exception {

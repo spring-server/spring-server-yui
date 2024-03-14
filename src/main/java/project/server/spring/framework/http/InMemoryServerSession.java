@@ -8,7 +8,10 @@ public class InMemoryServerSession implements HttpSession {
 		if (sessionId == null) {
 			throw new IllegalArgumentException("session id is null");
 		}
-		this.session = new Session(sessionId);
+		if (SessionStore.get(sessionId) == null) {
+			throw new IllegalArgumentException("invalid session id");
+		}
+		this.session = SessionStore.get(sessionId);
 	}
 
 	@Override
@@ -19,6 +22,7 @@ public class InMemoryServerSession implements HttpSession {
 
 	@Override
 	public Object getAttribute(String name) {
+
 		return session != null ? session.getAttribute(name) : null;
 	}
 
@@ -44,6 +48,9 @@ public class InMemoryServerSession implements HttpSession {
 
 	@Override
 	public String getId() {
+		if (session == null) {
+			throw new IllegalArgumentException("session is null");
+		}
 		return session.getId();
 	}
 

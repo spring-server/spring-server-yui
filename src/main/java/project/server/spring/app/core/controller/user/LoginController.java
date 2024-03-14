@@ -9,8 +9,10 @@ import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.http.HttpBody;
 import project.server.spring.framework.http.HttpMethod;
 import project.server.spring.framework.http.HttpSession;
+import project.server.spring.framework.http.MediaType;
 import project.server.spring.framework.servlet.HttpServletRequest;
 import project.server.spring.framework.servlet.HttpServletResponse;
+import project.server.spring.framework.servlet.ModelAndView;
 import project.server.spring.framework.utils.ObjectMapper;
 
 @Controller
@@ -26,13 +28,14 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/sign-in", method = HttpMethod.POST)
-	public String login(HttpServletRequest request, HttpServletResponse response) {
-		HttpBody httpBody = ObjectMapper.readValue(request.getBody(), request.getContentType());
+	public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
+		log.info("dddd");
+		HttpBody httpBody = ObjectMapper.readValue(request.getBody(), MediaType.ofValue(request.getContentType()));
 		HttpSession session = request.createSession();
 		String email = httpBody.get(EMAIL_KEY);
 		String password = httpBody.get(PASSWORD_KEY);
 		Long userId = userService.login(email, password);
 		session.setAttribute(USER_ID, userId);
-		return "redirect:/";
+		return new ModelAndView("redirect:/");
 	}
 }

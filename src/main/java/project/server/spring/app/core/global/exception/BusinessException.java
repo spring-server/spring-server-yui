@@ -1,4 +1,4 @@
-package project.server.spring.app.core.global;
+package project.server.spring.app.core.global.exception;
 
 import project.server.spring.framework.http.HttpStatus;
 

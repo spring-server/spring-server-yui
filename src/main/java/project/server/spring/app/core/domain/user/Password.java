@@ -25,4 +25,13 @@ public record Password(String value) {
 	public String toString() {
 		return value;
 	}
+
+	public boolean match(String value) {
+		return this.value.equals(value);
+	}
+
+	@Override
+	public String value() {
+		return "***********";
+	}
 }
