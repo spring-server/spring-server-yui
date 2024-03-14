@@ -12,6 +12,8 @@ public class User {
 	private Name name;
 	private Password password;
 
+	private PhoneNumber phoneNumber;
+
 	private Email email;
 
 	public User(String name, String password, String email) {
@@ -22,6 +24,17 @@ public class User {
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getPhoneNumber() {
+		if (this.phoneNumber != null) {
+			return phoneNumber.value();
+		}
+		return EMPTY_STRING;
+	}
+
+	public void setPhoneNumber(PhoneNumber phoneNumber) {
+		this.phoneNumber = phoneNumber;
 	}
 
 	public String getName() {

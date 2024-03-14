@@ -14,7 +14,7 @@ public class UserInfoDto {
 		this.name = user.getName();
 		this.email = user.getEmail();
 		this.password = user.getMaskingPassword();
-		this.phoneNumber = "010-0000-0000";
+		this.phoneNumber = user.getPhoneNumber();
 	}
 
 	public Map<String, Object> toMap(Map<String, Object> map) {

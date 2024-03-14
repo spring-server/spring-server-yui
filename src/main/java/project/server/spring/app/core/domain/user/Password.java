@@ -16,8 +16,7 @@ public record Password(String value) {
 	private void validate(String value) {
 		Matcher matcher = pattern.matcher(value);
 		if (!matcher.matches()) {
-			String message = String.format("password format is invalid");
-			throw new IllegalArgumentException(message);
+			throw new IllegalArgumentException("password format is invalid");
 		}
 	}
 
