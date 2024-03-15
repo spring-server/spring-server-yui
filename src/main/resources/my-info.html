@@ -39,8 +39,8 @@
             <form class="validation-form" novalidate>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label for="username">ID</label>
-                        <input type="text" class="form-control" id="username" placeholder="$name" required>
+                        <label for="name">ID</label>
+                        <input type="text" class="form-control" id="name" placeholder="$name" required>
                         <div class="invalid-feedback">
                             ID를 입력해주세요.
                         </div>
@@ -62,8 +62,8 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label for="address">핸드폰 번호<span class="text-muted">&nbsp;(필수 아님)</span></label>
-                    <input type="text" class="form-control" id="address" placeholder="$phoneNumber" required>
+                    <label for="phoneNumber">핸드폰 번호<span class="text-muted">&nbsp;(필수 아님)</span></label>
+                    <input type="text" class="form-control" id="phoneNumber" placeholder="$phoneNumber" required>
                     <div class="invalid-feedback">
                         핸드폰 번호를 입력해주세요.
                     </div>
@@ -83,59 +83,5 @@
     <footer class="my-3 text-center text-small">
     </footer>
 </div>
-<script>
-    window.addEventListener('load', () => {
-        const forms = document.getElementsByClassName('validation-form');
-        Array.prototype.filter.call(forms, (form) => {
-            form.addEventListener('submit', function (event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    }, false);
-
-    window.addEventListener('DOMContentLoaded', (event) => {
-        fetch('http://localhost:8086/my-info.html')
-            .then(response => {
-                if (response.status === 301) {
-                    window.location.href = '/';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    });
-
-    function submitForm() {
-        const formData = {
-            username: document.getElementById('username').value,
-            password: document.getElementById('password').value,
-            email: document.getElementById('email').value,
-            phoneNumber: document.getElementById('address').value
-        };
-
-        fetch('http://localhost:8083/profile', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                // Redirect to another page or show success message
-                window.location.href = '/';
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-</script>
-</body>
-
-</html>
+<script src="my-info.js"></script>
 
