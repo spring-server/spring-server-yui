@@ -36,4 +36,11 @@ public class UserService {
 			.orElseThrow(() -> new UserNotFoundException("userId does not exist"));
 		return new UserInfoDto(user);
 	}
+
+	public void update(UserInfoDto userInfoDto, Long userId) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new UserNotFoundException("userId does not exist"));
+		user.update(userInfoDto.getName(), userInfoDto.getPassword(), userInfoDto.getEmail(),
+			userInfoDto.getPhoneNumber());
+	}
 }

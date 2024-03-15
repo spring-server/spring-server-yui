@@ -5,10 +5,13 @@ import java.util.Map;
 import project.server.spring.app.core.domain.user.User;
 
 public class UserInfoDto {
-	private final String name;
-	private final String email;
-	private final String password;
-	private final String phoneNumber;
+	private String name;
+	private String email;
+	private String password;
+	private String phoneNumber;
+
+	public UserInfoDto() {
+	}
 
 	public UserInfoDto(User user) {
 		this.name = user.getName();
@@ -23,5 +26,21 @@ public class UserInfoDto {
 		map.put("password", password);
 		map.put("phoneNumber", phoneNumber);
 		return map;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public String getPhoneNumber() {
+		return phoneNumber;
 	}
 }

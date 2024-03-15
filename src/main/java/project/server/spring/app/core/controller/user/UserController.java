@@ -3,6 +3,8 @@ package project.server.spring.app.core.controller.user;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import project.server.spring.app.core.dto.UserInfoDto;
 import project.server.spring.app.core.service.user.UserService;
 import project.server.spring.framework.annotation.Controller;
@@ -14,7 +16,7 @@ import project.server.spring.framework.http.MediaType;
 import project.server.spring.framework.servlet.HttpServletRequest;
 import project.server.spring.framework.servlet.HttpServletResponse;
 import project.server.spring.framework.servlet.ModelAndView;
-import project.server.spring.framework.utils.ObjectMapper;
+import project.server.spring.framework.utils.BodyParser;
 
 @Controller
 public class UserController {
@@ -32,7 +34,7 @@ public class UserController {
 
 	@RequestMapping(value = "/sign-up", method = HttpMethod.POST)
 	public ModelAndView signUp(HttpServletRequest request, HttpServletResponse response) {
-		HttpBody httpBody = ObjectMapper.readValue(request.getBody(), MediaType.ofValue(request.getContentType()));
+		HttpBody httpBody = BodyParser.readForm(request.getBody(), MediaType.ofValue(request.getContentType()));
 		assert httpBody != null;
 		String name = httpBody.get(NAME_KEY);
 		String email = httpBody.get(EMAIL_KEY);
@@ -41,17 +43,14 @@ public class UserController {
 		return new ModelAndView("redirect:/");
 	}
 
-	@RequestMapping(value = "/details")
-	public ModelAndView getUserInfo(HttpServletRequest request, HttpServletResponse response) {
-		HttpSession session = request.getSession();
-		UserInfoDto userInfo = userService.getUserInfo((Long)session.getAttribute(USER_ID));
-		ModelAndView modelAndView = new ModelAndView();
-		modelAndView.addAttribute("json", userInfo);
-		return modelAndView;
-	}
-
 	@RequestMapping(value = "/profile", method = HttpMethod.PUT)
-	public ModelAndView updateUserInfo(HttpServletRequest request, HttpServletResponse response) {
-		return new ModelAndView("redirect:/");
+	public ModelAndView updateUserInfo(HttpServletRequest request, HttpServletResponse response) throws
+		JsonProcessingException {
+		HttpSession session = request.getSession();
+		UserInfoDto userInfoDto = BodyParser.readJson(request.getBody(), MediaType.ofValue(request.getContentType()),
+			UserInfoDto.class);
+		userService.update(userInfoDto, (Long)session.getAttribute(USER_ID));
+		response.setContentType(MediaType.APPLICATION_JSON.getValue());
+		return new ModelAndView();
 	}
 }

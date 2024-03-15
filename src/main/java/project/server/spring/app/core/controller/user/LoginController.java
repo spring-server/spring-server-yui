@@ -13,7 +13,7 @@ import project.server.spring.framework.http.MediaType;
 import project.server.spring.framework.servlet.HttpServletRequest;
 import project.server.spring.framework.servlet.HttpServletResponse;
 import project.server.spring.framework.servlet.ModelAndView;
-import project.server.spring.framework.utils.ObjectMapper;
+import project.server.spring.framework.utils.BodyParser;
 
 @Controller
 public class LoginController {
@@ -29,8 +29,7 @@ public class LoginController {
 
 	@RequestMapping(value = "/sign-in", method = HttpMethod.POST)
 	public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
-		log.info("dddd");
-		HttpBody httpBody = ObjectMapper.readValue(request.getBody(), MediaType.ofValue(request.getContentType()));
+		HttpBody httpBody = BodyParser.readForm(request.getBody(), MediaType.ofValue(request.getContentType()));
 		HttpSession session = request.createSession();
 		String email = httpBody.get(EMAIL_KEY);
 		String password = httpBody.get(PASSWORD_KEY);

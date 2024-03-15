@@ -4,11 +4,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import project.server.spring.framework.http.HttpBody;
 import project.server.spring.framework.http.MediaType;
 
-public class ObjectMapper {
-	public static HttpBody readValue(char[] rawbody, MediaType mediaType) {
+public class BodyParser {
+	private static final ObjectMapper objectMapper = new ObjectMapper();
+
+	public static HttpBody readForm(char[] rawbody, MediaType mediaType) {
 		if (rawbody == null) {
 			throw new IllegalArgumentException("http body is empty");
 		}
@@ -26,4 +31,11 @@ public class ObjectMapper {
 		}
 		return null;
 	}
+
+	public static <T> T readJson(char[] rawbody, MediaType mediaType, Class<T> valueType) throws
+		JsonProcessingException {
+		return objectMapper.readValue(new String(rawbody), valueType);
+
+	}
+
 }
