@@ -8,11 +8,15 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import project.server.spring.framework.RequestHandler;
 import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.context.ApplicationContext;
 import project.server.spring.framework.http.Cookie;
 import project.server.spring.framework.http.HttpSession;
+import project.server.spring.framework.http.HttpStatus;
+import project.server.spring.framework.http.error.ErrorResponse;
 import project.server.spring.framework.servlet.handler.HandlerMethod;
 import project.server.spring.framework.util.PageProcessor;
 
@@ -24,6 +28,8 @@ public class DispatcherServlet extends FrameworkServlet {
 	private static final String END_CHARCTER = "\\.";
 
 	private static final String REDIRECT_INDEX = "redirect:";
+
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private DispatcherServlet() {
 	}
@@ -39,19 +45,45 @@ public class DispatcherServlet extends FrameworkServlet {
 	private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws
 		InvocationTargetException,
 		IllegalAccessException, IOException {
-		HandlerMethod handlerMethod = getHandlerMethod(request);
-		if (handlerMethod == null) {
-			//TODO: response 상태코드 설정 어디서 할지
-			throw new IllegalStateException("handler method does not exit");
+		try {
+			HandlerMethod handlerMethod = getHandlerMethod(request);
+			if (handlerMethod == null) {
+				throw new IllegalStateException("handler method does not exit");
+			}
+			log.info("info : {} , {}", handlerMethod.getHandler(), handlerMethod.getMethod());
+			ModelAndView modelAndView = (ModelAndView)handlerMethod.getMethod()
+				.invoke(handlerMethod.getHandler(), request, response);
+			//TODO: 세션 처리해주는 로직 어떻게 분리할지
+			handleSession(request, response);
+			if (modelAndView.getView() == null) {
+				resolveResponseBody(response);
+				return;
+			}
+			resolveView(modelAndView, response);
+		} catch (Exception exception) {
+			resolveException(response, exception);
 		}
-		ModelAndView modelAndView = (ModelAndView)handlerMethod.getMethod()
-			.invoke(handlerMethod.getHandler(), request, response);
-		//TODO: 세션 처리해주는 로직 어떻게 분리할지
-		handleSession(request, response);
-		if (modelAndView.getView() == null) {
-			throw new IllegalStateException("view name is null");
+	}
+
+	void resolveException(HttpServletResponse response, Exception exception) throws IOException {
+		Throwable cause = exception.getCause();
+		if (cause == null) {
+			response.setContentType("text/html; charset=UTF-8");
+			PageProcessor pageProcessor = new PageProcessor();
+			String page = pageProcessor.read("400.html");
+			response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), page.getBytes());
+			return;
 		}
-		resolveView(modelAndView, response);
+		ErrorResponse errorResponse = objectMapper.readValue(cause.toString(), ErrorResponse.class);
+		PageProcessor pageProcessor = new PageProcessor();
+		String page = pageProcessor.read("400.html");
+		response.setContentType("text/html; charset=UTF-8");
+		response.sendError(errorResponse.getCode(), page.getBytes());
+	}
+
+	private void resolveResponseBody(HttpServletResponse response) {
+		response.setStatus(200);
+		response.flush(null);
 	}
 
 	private void handleSession(HttpServletRequest request, HttpServletResponse response) {
@@ -69,8 +101,6 @@ public class DispatcherServlet extends FrameworkServlet {
 			cookie.setHttpOnly(true);
 			cookie.setMaxAge(600);
 			response.addCookie(cookie);
-		} else {
-			log.info("check");
 		}
 	}
 
@@ -93,7 +123,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 	private String getViewName(String viewName) {
 		if (viewName.startsWith(REDIRECT_INDEX)) {
-			return viewName.substring(REDIRECT_INDEX.length()) + "";
+			return viewName.substring(REDIRECT_INDEX.length());
 		}
 		return viewName + ".html";
 	}

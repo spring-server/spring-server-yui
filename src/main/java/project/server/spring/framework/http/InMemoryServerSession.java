@@ -63,4 +63,9 @@ public class InMemoryServerSession implements HttpSession {
 	public boolean isNew() {
 		return SessionStore.get(session.getId()) == null;
 	}
+
+	@Override
+	public boolean isExpired() {
+		return session.isExpired();
+	}
 }

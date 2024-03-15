@@ -27,6 +27,11 @@ public abstract class FrameworkServlet extends HttpServlet {
 		processRequest(request, response);
 	}
 
+	@Override
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		processRequest(request, response);
+	}
+
 	protected abstract void doService(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
 	//TODO: 검토 필요
@@ -56,8 +61,6 @@ public abstract class FrameworkServlet extends HttpServlet {
 		HttpServletResponse response
 	) throws IOException {
 		handleStaticResource(request.getRequestURI(), response);
-		// ResourceHttpRequestHandler handler = ResourceHttpRequestHandler.getInstance();
-		// handler.handleRequest(request, response);
 	}
 
 	protected final void processRequest(

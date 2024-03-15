@@ -34,6 +34,7 @@ public class SyncHttpRequest implements HttpServletRequest {
 		this.requestLine = new RequestLine();
 		this.httpHeaders = new HttpHeaders();
 		readClientMessage();
+		log.info("method: {}, path: {}", requestLine.getHttpMethod().name(), requestLine.getPath());
 	}
 
 	//TODO: path vs uri
@@ -61,6 +62,9 @@ public class SyncHttpRequest implements HttpServletRequest {
 			}
 		}
 		if (session == null) {
+			return null;
+		}
+		if (session.isExpired()) {
 			return null;
 		}
 		return new InMemoryServerSession(session.getId());

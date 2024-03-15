@@ -5,6 +5,8 @@ public interface HttpSession {
 
 	Object getAttribute(String name);
 
+	boolean isExpired();
+
 	long getCreationTime();
 
 	long getLastAccessedTime();

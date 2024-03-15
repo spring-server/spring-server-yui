@@ -13,6 +13,10 @@ public class SessionStore {
 
 	public static Session get(String sessionId) {
 		Session session = sessionMap.get(sessionId);
+		if (session.isExpired()) {
+			return null;
+		}
+		session.renew();
 		return session;
 	}
 

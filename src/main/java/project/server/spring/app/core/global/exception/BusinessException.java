@@ -14,4 +14,13 @@ public class BusinessException extends RuntimeException {
 		super(message, cause);
 		this.status = status;
 	}
+
+	@Override
+	public String toString() {
+		return String.format(
+			"{\"code\":%d, \"message\":\"%s\"}",
+			status.getCode(),
+			getMessage()
+		);
+	}
 }
