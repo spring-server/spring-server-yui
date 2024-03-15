@@ -107,4 +107,11 @@ public class User {
 			throw new AuthenticationException("invalid password");
 		}
 	}
+
+	public void update(String name, String password, String email, String phoneNumber) {
+		this.name = new Name(name);
+		this.password = new Password(password);
+		this.email = new Email(email);
+		this.phoneNumber = new PhoneNumber(phoneNumber);
+	}
 }

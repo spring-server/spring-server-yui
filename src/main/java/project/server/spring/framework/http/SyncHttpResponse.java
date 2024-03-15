@@ -38,30 +38,8 @@ public class SyncHttpResponse implements HttpServletResponse {
 	@Override
 	public void addCookie(Cookie cookie) {
 		this.cookies.add(cookie);
-		String header = this.generateCookieString(cookie);
+		String header = cookie.makeHeaderValue();
 		httpHeaders.add("Set-Cookie", header);
-	}
-
-	private String generateCookieString(Cookie cookie) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(cookie.getName()).append("=").append(cookie.getValue());
-		if (cookie.getMaxAge() > -1) {
-			sb.append("; Max-Age=").append(cookie.getMaxAge());
-		}
-		if (cookie.getPath() != null) {
-			sb.append("; Path=").append(cookie.getPath());
-		}
-		if (cookie.getDomain() != null) {
-			sb.append("; Domain=").append(cookie.getDomain());
-		}
-		if (cookie.getSecure()) {
-			sb.append("; Secure");
-		}
-		if (cookie.isHttpOnly()) {
-			sb.append("; HttpOnly");
-		}
-
-		return sb.toString();
 	}
 
 	@Override
@@ -204,10 +182,14 @@ public class SyncHttpResponse implements HttpServletResponse {
 	@Override
 	public void flush(byte[] body) {
 		try {
-			httpHeaders.setContentLength(body.length);
+			if (body != null) {
+				httpHeaders.setContentLength(body.length);
+			}
 			String message = generateResponseString(null);
 			outputStream.write(message.getBytes());
-			outputStream.write(body);
+			if (body != null) {
+				outputStream.write(body);
+			}
 		} catch (IOException e) {
 			log.info(e.getMessage());
 		}
