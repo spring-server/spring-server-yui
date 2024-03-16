@@ -1,5 +1,7 @@
 package project.server.spring.app.core.domain.user;
 
+import static project.server.spring.app.core.global.error.ErrorMessage.*;
+
 import java.util.Objects;
 
 import project.server.spring.app.core.global.exception.AuthenticationException;
@@ -31,10 +33,6 @@ public class User {
 			return phoneNumber.value();
 		}
 		return EMPTY_STRING;
-	}
-
-	public void setPhoneNumber(PhoneNumber phoneNumber) {
-		this.phoneNumber = phoneNumber;
 	}
 
 	public String getName() {
@@ -89,7 +87,7 @@ public class User {
 
 	public void initializeId(Long id) {
 		if (!isNew()) {
-			throw new DuplicatedUserException("user is duplicated");
+			throw new DuplicatedUserException(USER_DUPLICATED.getMessage());
 		}
 		this.id = id;
 	}
@@ -104,7 +102,7 @@ public class User {
 
 	public void validatePassword(String password) {
 		if (!this.password.match(password)) {
-			throw new AuthenticationException("invalid password");
+			throw new AuthenticationException(INVALID_PASSWORD.getMessage());
 		}
 	}
 

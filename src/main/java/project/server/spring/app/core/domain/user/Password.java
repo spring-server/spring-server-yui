@@ -3,6 +3,9 @@ package project.server.spring.app.core.domain.user;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import project.server.spring.app.core.global.error.ErrorMessage;
+import project.server.spring.app.core.global.exception.InvalidParameterException;
+
 public record Password(String value) {
 	/**
 	 * 정규식 : 대문자 1개 이상, 소문자 1개이상, 숫자 1개이상, 8개 이상
@@ -16,7 +19,7 @@ public record Password(String value) {
 	private void validate(String value) {
 		Matcher matcher = pattern.matcher(value);
 		if (!matcher.matches()) {
-			throw new IllegalArgumentException("password format is invalid");
+			throw new InvalidParameterException(String.format(ErrorMessage.INVALID_FORMAT.getMessage(), "password"));
 		}
 	}
 
