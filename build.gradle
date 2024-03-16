@@ -20,7 +20,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:${logbackVersion}")
     implementation("org.apache.commons:commons-dbcp2:${commonsDbcp2Version}")
     implementation("org.reflections:reflections:${reflectionsVersion}")
-    트 implementation('com.fasterxml.jackson.core:jackson-databind:2.17.0')
+    implementation('com.fasterxml.jackson.core:jackson-databind:2.17.0')
 
     // Test
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
