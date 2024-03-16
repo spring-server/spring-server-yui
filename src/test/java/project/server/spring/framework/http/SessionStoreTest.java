@@ -22,7 +22,7 @@ class SessionStoreTest {
 	@DisplayName("만료 세션 테스트")
 	void expiredSessionTest() {
 		long current = Instant.now().minusSeconds(601).toEpochMilli();
-		long past = Instant.now().minusSeconds(1000).toEpochMilli();
+		long past = Instant.now().minusSeconds(1_000).toEpochMilli();
 		Session session = new Session("test", past, current);
 		assertTrue(session.isExpired());
 	}

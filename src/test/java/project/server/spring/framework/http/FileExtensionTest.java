@@ -19,7 +19,7 @@ class FileExtensionTest {
 	@ParameterizedTest
 	@ValueSource(strings = {".hello", "eui"})
 	void testInvalid(String parameter) {
-		assertEquals(findByType(parameter), DEFAULT);
+		assertEquals(DEFAULT, findByType(parameter));
 	}
 
 	@ParameterizedTest
