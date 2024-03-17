@@ -1,5 +1,7 @@
 package project.server.spring.app.core.controller.base;
 
+import static project.server.spring.app.core.global.error.ErrorMessage.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public class BaseController {
 	public ModelAndView profile(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
 		if (session == null) {
-			throw new AuthenticationException("authentication is needed");
+			throw new AuthenticationException(AUTHENTICATION_FAILED.getMessage());
 		}
 		Long userId = (Long)session.getAttribute(USER_ID);
 		ModelAndView modelAndView = new ModelAndView("my-info");
