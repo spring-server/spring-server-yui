@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import project.server.spring.framework.http.MediaType;
-import project.server.spring.framework.util.FileFormat;
 
 public abstract class FrameworkServlet extends HttpServlet {
 	private static final Logger log = LoggerFactory.getLogger(FrameworkServlet.class);
@@ -25,6 +24,11 @@ public abstract class FrameworkServlet extends HttpServlet {
 			processStaticRequest(request, response);
 			return;
 		}
+		processRequest(request, response);
+	}
+
+	@Override
+	protected void doPut(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		processRequest(request, response);
 	}
 
@@ -57,8 +61,6 @@ public abstract class FrameworkServlet extends HttpServlet {
 		HttpServletResponse response
 	) throws IOException {
 		handleStaticResource(request.getRequestURI(), response);
-		// ResourceHttpRequestHandler handler = ResourceHttpRequestHandler.getInstance();
-		// handler.handleRequest(request, response);
 	}
 
 	protected final void processRequest(
@@ -73,8 +75,7 @@ public abstract class FrameworkServlet extends HttpServlet {
 			String[] pathElements = parsePath(path);
 			String[] fileElements = pathElements[pathElements.length - 1].split(END_CHARCTER);
 			String extension = fileElements[1];
-			FileFormat fileFormat = FileFormat.ofExtension(extension);
-			response.setContentType(MediaType.ofSubType(fileFormat.getExtension()));
+			response.setContentType(MediaType.ofSubType(extension).getValue());
 			response.dispatch(path);
 		} catch (RuntimeException e) {
 			log.info("exception message : {}", e.getMessage());

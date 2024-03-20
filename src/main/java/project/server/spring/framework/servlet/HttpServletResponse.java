@@ -1,26 +1,47 @@
 package project.server.spring.framework.servlet;
 
 import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.Collection;
 
-import project.server.spring.framework.http.HttpStatus;
-import project.server.spring.framework.http.MediaType;
+import project.server.spring.framework.http.Cookie;
 
 public interface HttpServletResponse extends ServletResponse {
+	void addCookie(Cookie var1);
 
-	void sendError(HttpStatus status);
+	boolean containsHeader(String var1);
 
-	// void setHeader(String name, String value);
+	String encodeURL(String var1);
 
-	//TODO: 나중에 지우기
-	void dispatch(String path);
+	String encodeRedirectURL(String var1);
 
-	void render200(byte[] body, int lengthOfBodyContent) throws IOException;
+	void sendError(int var1, byte[] var2) throws IOException;
 
-	void render40x(byte[] body, int lengthOfBodyContent) throws IOException;
+	void sendError(int var1) throws IOException;
 
-	void render30x(String redirectUrl) throws IOException;
+	void sendRedirect(String location) throws IOException;
 
-	void setContentType(MediaType mediaType);
+	void setDateHeader(String var1, ZonedDateTime time);
 
-	void setStatus(HttpStatus status);
+	void addDateHeader(String var1, ZonedDateTime time);
+
+	void setHeader(String var1, String var2);
+
+	void addHeader(String var1, String var2);
+
+	void setIntHeader(String var1, int var2);
+
+	void addIntHeader(String var1, int var2);
+
+	void setStatus(int var1);
+
+	int getStatus();
+
+	String getHeader(String var1);
+
+	Collection<String> getHeaderNames();
+
+	public void flush(byte[] body);
+
+	public void dispatch(String url);
 }

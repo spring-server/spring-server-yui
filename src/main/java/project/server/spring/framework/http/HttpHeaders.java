@@ -1,6 +1,8 @@
 package project.server.spring.framework.http;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,12 +19,19 @@ public class HttpHeaders {
 	public static final String AUTHORIZATION = "Authorization";
 	public static final String CONNECTION = "Connection";
 	public static final String COOKIE = "Cookie";
+	public static final String SET_COOKIE = "Set-Cookie";
 	public static final String HOST = "Host";
 	private final Map<String, String> headers = new LinkedHashMap<>();
+	private static final String EQUIVALENCE = "=";
+	private static final String AND_INDEX = "; ";
+	private List<Cookie> cookies = new ArrayList<>();
 
 	void parse(String header) {
 		HttpRequestUtils.Pair pair = HttpRequestUtils.parseHeader(header);
 		add(pair.getKey(), pair.getValue());
+		if (COOKIE.equals(pair.getKey())) {
+			cookies = HttpRequestUtils.makeCookies(pair.getValue());
+		}
 	}
 
 	public String get(String key) {
@@ -45,7 +54,7 @@ public class HttpHeaders {
 
 	public MediaType getContentType() {
 		String value = get(CONTENT_TYPE);
-		return (MediaType.ofValue(value));
+		return MediaType.ofValue(value);
 	}
 
 	public void setContentType(MediaType mediaType) {
@@ -55,5 +64,13 @@ public class HttpHeaders {
 
 	public Set<String> getAllFields() {
 		return headers.keySet();
+	}
+
+	public List<Cookie> getCookies() {
+		return cookies;
+	}
+
+	public boolean contains(String name) {
+		return headers.get(name) != null;
 	}
 }

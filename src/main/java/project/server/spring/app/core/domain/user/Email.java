@@ -3,6 +3,8 @@ package project.server.spring.app.core.domain.user;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import project.server.spring.app.core.global.exception.InvalidParameterException;
+
 public record Email(String emailAddress) {
 	private static final int USERNAME_INDEX = 0;
 	private static final int DOMAIN_INDEX = 1;
@@ -16,7 +18,7 @@ public record Email(String emailAddress) {
 		Matcher matcher = EMAIL_PATTERN.matcher(emailAddress);
 		if (!matcher.matches()) {
 			String message = String.format("invalid email address: %s", emailAddress);
-			throw new IllegalArgumentException(message);
+			throw new InvalidParameterException(message);
 		}
 	}
 

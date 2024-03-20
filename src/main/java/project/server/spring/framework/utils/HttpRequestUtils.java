@@ -1,12 +1,16 @@
 package project.server.spring.framework.utils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import project.server.spring.framework.http.Cookie;
 
 public final class HttpRequestUtils {
 	/**
@@ -25,6 +29,10 @@ public final class HttpRequestUtils {
 		return parseValues(cookies, ";");
 	}
 
+	public static List<Cookie> makeCookies(String cookieValue) {
+		return parseValuesToList(cookieValue, ";");
+	}
+
 	private static Map<String, String> parseValues(
 		String values,
 		String separator
@@ -36,6 +44,21 @@ public final class HttpRequestUtils {
 		String[] tokens = values.split(separator);
 		return Arrays.stream(tokens).map(t -> getKeyValue(t, "=")).filter(Objects::nonNull)
 			.collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+	}
+
+	private static List<Cookie> parseValuesToList(
+		String values,
+		String separator
+	) {
+		if (Strings.isNullOrEmpty(values)) {
+			return Lists.newArrayList();
+		}
+		String[] tokens = values.split(separator);
+		return Arrays.stream(tokens)
+			.map(t -> getKeyValue(t, "="))
+			.filter(Objects::nonNull)
+			.map(ele -> new Cookie(ele.getKey(), ele.getValue()))
+			.collect(Collectors.toList());
 	}
 
 	public static Pair parseUri(String uri) {

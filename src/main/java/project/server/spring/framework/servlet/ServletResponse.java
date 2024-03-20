@@ -5,4 +5,6 @@ import java.io.OutputStream;
 
 public interface ServletResponse {
 	OutputStream getOutputStream() throws IOException;
+
+	void setContentType(String contentType);
 }

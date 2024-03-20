@@ -1,7 +1,11 @@
 package project.server.spring.framework.servlet;
 
-import project.server.spring.framework.http.HttpHeaders;
+import java.util.Collection;
+import java.util.List;
+
+import project.server.spring.framework.http.Cookie;
 import project.server.spring.framework.http.HttpMethod;
+import project.server.spring.framework.http.HttpSession;
 import project.server.spring.framework.http.QueryParams;
 
 public interface HttpServletRequest extends ServletRequest {
@@ -11,9 +15,17 @@ public interface HttpServletRequest extends ServletRequest {
 
 	QueryParams getQueryParams();
 
-	String getHeader(String name);
+	HttpSession getSession();
 
-	public HttpHeaders getHeaders();
+	HttpSession createSession();
 
-	public char[] getBody();
+	List<Cookie> getCookies();
+
+	String getHeader(String var1);
+
+	Collection<String> getHeaderNames();
+
+	int getIntHeader(String var1);
+
+	char[] getBody();
 }

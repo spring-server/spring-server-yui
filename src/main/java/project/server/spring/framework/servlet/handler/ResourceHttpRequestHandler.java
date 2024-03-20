@@ -30,7 +30,7 @@ public class ResourceHttpRequestHandler implements HttpRequestHandler {
 		InputStream inputStream = getInputStream(uri);
 		if (inputStream == null) {
 			log.debug("Resource not found");
-			response.sendError(HttpStatus.BAD_REQUEST);
+			response.sendError(HttpStatus.BAD_REQUEST.getCode());
 			return;
 		}
 		byte[] bytes = readStream(inputStream);
