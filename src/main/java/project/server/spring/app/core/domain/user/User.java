@@ -24,6 +24,14 @@ public class User {
 		this.email = new Email(email);
 	}
 
+	public User(Long id, String name, String password, String email, String phoneNumber) {
+		this.id = id;
+		this.name = new Name(name);
+		this.password = new Password(password);
+		this.email = new Email(email);
+		this.phoneNumber = PhoneNumber.optional(phoneNumber);
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -32,7 +40,7 @@ public class User {
 		if (this.phoneNumber != null) {
 			return phoneNumber.value();
 		}
-		return EMPTY_STRING;
+		return null;
 	}
 
 	public String getName() {

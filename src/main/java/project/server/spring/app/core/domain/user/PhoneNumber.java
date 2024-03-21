@@ -25,4 +25,11 @@ public record PhoneNumber(String value) {
 	public String toString() {
 		return value;
 	}
+
+	public static PhoneNumber optional(String value) {
+		if (value == null) {
+			return null;
+		}
+		return new PhoneNumber(value);
+	}
 }

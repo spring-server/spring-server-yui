@@ -6,9 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 import project.server.spring.app.core.domain.user.User;
-import project.server.spring.framework.annotation.Repository;
 
-@Repository
 public class InMemoryUserRepository implements UserRepository {
 	private static final Map<Long, User> users = new ConcurrentHashMap<>();
 	private static final AtomicLong idGenerator = new AtomicLong(0L);
