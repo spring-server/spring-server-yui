@@ -1,5 +1,6 @@
 package project.server.spring.framework.context;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -19,20 +20,35 @@ import org.reflections.util.ConfigurationBuilder;
 import project.server.spring.framework.annotation.Bean;
 import project.server.spring.framework.annotation.Component;
 import project.server.spring.framework.annotation.Configuration;
+import project.server.spring.framework.configuration.ConfigLoader;
+import project.server.spring.framework.configuration.ConfigMap;
+import project.server.spring.framework.configuration.SpringConfig;
 
 public class ApplicationContext {
 	private static final Map<Class<?>, Object> registeredClassTypeMap = new HashMap<>();
 	private static final Map<Class<?>, List<Object>> registeredInterfaceTypeMap = new HashMap<>();
 	private static final Map<String, Object> registeredBeanMap = new HashMap<>();
+
+	private final Set<Class<?>> components;
 	private static Reflections reflections;
 
 	public ApplicationContext(String basePackage) throws
 		Exception {
 		reflections = getReflections(basePackage);
-		Set<Class<?>> components = reflections.getTypesAnnotatedWith(Component.class);
+		components = reflections.getTypesAnnotatedWith(Component.class);
+		processConfigMap();
 		Set<Class<?>> configurations = reflections.getTypesAnnotatedWith(Configuration.class);
 		componentScan(components);
 		registerByConfigurations(configurations);
+	}
+
+	private void processConfigMap() throws IOException {
+		ConfigLoader configLoader = new ConfigLoader();
+		ConfigMap configMap = configLoader.getConfigMap();
+		SpringConfig springConfig = configMap.getSpring();
+		components.add(springConfig.getDatasource().getClass());
+		registeredClassTypeMap.put(springConfig.getDatasource().getClass(), springConfig.getDatasource());
+
 	}
 
 	private Reflections getReflections(String basePackage) {
@@ -140,15 +156,16 @@ public class ApplicationContext {
 		if (implementations.isEmpty()) {
 			throw new IllegalStateException("No implementation found for interface: " + clazz.getName());
 		}
-		Class<?> subTypeClass = implementations.iterator().next();
-
-		//TODO: 수정 들어가기
-		Object subTypeInstance = add(subTypeClass);
 		List<Object> subTypeInstances = registeredInterfaceTypeMap.get(clazz);
 		if (subTypeInstances == null) {
 			subTypeInstances = new ArrayList<>();
 		}
-		subTypeInstances.add(subTypeInstance);
+		for (Class<?> implementation : implementations) {
+			if (components.contains(implementation)) {
+				Object subTypeInstance = add(implementation);
+				subTypeInstances.add(subTypeInstance);
+			}
+		}
 		registeredInterfaceTypeMap.put(clazz, subTypeInstances);
 	}
 
