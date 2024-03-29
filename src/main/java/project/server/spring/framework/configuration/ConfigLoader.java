@@ -12,14 +12,14 @@ public class ConfigLoader {
 
 	public ConfigMap getConfigMap() throws IOException {
 		if (configMap == null) {
-			return loadConfigMap("application.yml");
+			return loadConfigMap("/application.yml");
 		}
 		return configMap;
 	}
 
 	private ConfigMap loadConfigMap(String resourcePath) throws IOException {
-		InputStream inputStream = ConfigLoader.class.getClassLoader()
-			.getResourceAsStream(resourcePath);
+		InputStream inputStream = ConfigLoader.class.
+			getResourceAsStream(resourcePath);
 		if (inputStream == null) {
 			throw new IllegalArgumentException("resource not found " + resourcePath);
 		}
