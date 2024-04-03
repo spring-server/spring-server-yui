@@ -17,7 +17,11 @@ public class UserInfoDto {
 		this.name = user.getName();
 		this.email = user.getEmail();
 		this.password = user.getMaskingPassword();
-		this.phoneNumber = user.getPhoneNumber();
+		this.phoneNumber = getPhoneNumber(user);
+	}
+
+	private String getPhoneNumber(User user) {
+		return user.getPhoneNumber() == null ? "" : user.getPhoneNumber();
 	}
 
 	public Map<String, Object> toMap(Map<String, Object> map) {

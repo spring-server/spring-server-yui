@@ -44,5 +44,6 @@ public class UserService {
 			.orElseThrow(() -> new UserNotFoundException(String.format(NOT_FOUND.getMessage(), "userId")));
 		user.update(userInfoDto.getName(), userInfoDto.getPassword(), userInfoDto.getEmail(),
 			userInfoDto.getPhoneNumber());
+		userRepository.save(user);
 	}
 }
