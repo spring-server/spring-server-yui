@@ -23,6 +23,7 @@ import project.server.spring.framework.annotation.Configuration;
 import project.server.spring.framework.configuration.ConfigLoader;
 import project.server.spring.framework.configuration.ConfigMap;
 import project.server.spring.framework.configuration.SpringConfig;
+import project.server.spring.framework.servlet.DispatcherServlet;
 
 public class ApplicationContext {
 	private static final Map<Class<?>, Object> registeredClassTypeMap = new HashMap<>();
@@ -32,6 +33,8 @@ public class ApplicationContext {
 	private final Set<Class<?>> components;
 	private static Reflections reflections;
 
+	private static WebMvcConfigurerComposite webMvcConfigurerComposite;
+
 	public ApplicationContext(String basePackage) throws
 		Exception {
 		reflections = getReflections(basePackage);
@@ -40,6 +43,8 @@ public class ApplicationContext {
 		Set<Class<?>> configurations = reflections.getTypesAnnotatedWith(Configuration.class);
 		componentScan(components);
 		registerByConfigurations(configurations);
+		webMvcConfigurerComposite = new WebMvcConfigurerComposite();
+		registeredClassTypeMap.put(DispatcherServlet.class, new DispatcherServlet());
 	}
 
 	private void processConfigMap() throws IOException {
@@ -67,6 +72,12 @@ public class ApplicationContext {
 				add(component);
 			}
 		}
+		for (Class<?> component : components) {
+			if (isInterface(component)) {
+				add(component);
+			}
+		}
+
 		for (Class<?> instance : components) {
 			if (isInstance(instance)) {
 				registerByBeanName(instance);
@@ -87,9 +98,23 @@ public class ApplicationContext {
 	}
 
 	private Object createConfiguration(Class<?> clazz) throws Exception {
-		Constructor<?> constructor = clazz.getDeclaredConstructor();
+		Constructor<?> constructor = clazz.getDeclaredConstructors()[0];
 		constructor.setAccessible(true);
-		return constructor.newInstance();
+		Class<?>[] parameterTypes = constructor.getParameterTypes();
+		Object[] params = new Object[parameterTypes.length];
+		for (int index = 0; index < parameterTypes.length; index++) {
+			Class<?> parameterType = parameterTypes[index];
+			if (!registeredClassTypeMap.containsKey(parameterType) && !registeredInterfaceTypeMap.containsKey(
+				parameterType)) {
+				add(parameterType);
+			}
+			if (parameterType.isInterface()) {
+				params[index] = registeredInterfaceTypeMap.get(parameterType).get(0);
+			} else {
+				params[index] = registeredClassTypeMap.get(parameterType);
+			}
+		}
+		return constructor.newInstance(params);
 	}
 
 	private void processBeanMethod(Object configInstance, Method method) throws Exception {
@@ -113,7 +138,7 @@ public class ApplicationContext {
 		InstantiationException,
 		IllegalAccessException {
 		if (registeredClassTypeMap.containsKey(clazz)) {
-			return null;
+			return registeredClassTypeMap.get(clazz);
 		}
 		if (clazz.isInterface()) {
 			addInterfaceInstance(clazz);
@@ -156,10 +181,7 @@ public class ApplicationContext {
 		if (implementations.isEmpty()) {
 			throw new IllegalStateException("No implementation found for interface: " + clazz.getName());
 		}
-		List<Object> subTypeInstances = registeredInterfaceTypeMap.get(clazz);
-		if (subTypeInstances == null) {
-			subTypeInstances = new ArrayList<>();
-		}
+		List<Object> subTypeInstances = registeredInterfaceTypeMap.getOrDefault(clazz, new ArrayList<>());
 		for (Class<?> implementation : implementations) {
 			if (components.contains(implementation)) {
 				Object subTypeInstance = add(implementation);
@@ -173,11 +195,26 @@ public class ApplicationContext {
 		return !clazz.isAnnotation() && !clazz.isInterface() && !Modifier.isAbstract(clazz.getModifiers());
 	}
 
+	private boolean isInterface(Class<?> clazz) {
+		return !clazz.isAnnotation() && clazz.isInterface();
+	}
+
 	public static <T> T getBean(Class<T> clazz) {
 		if (clazz.isInterface()) {
 			return clazz.cast(registeredInterfaceTypeMap.get(clazz).get(0));
 		}
 		return clazz.cast(registeredClassTypeMap.get(clazz));
+	}
+
+	public static <T> List<T> getBeans(Class<T> clazz) {
+		List<T> beans = new ArrayList<>();
+		if (clazz.isInterface()) {
+			for (Object object : registeredInterfaceTypeMap.get(clazz)) {
+				beans.add(clazz.cast(object));
+			}
+			return beans;
+		}
+		return List.of(clazz.cast(registeredClassTypeMap.get(clazz)));
 	}
 
 	public static <T> T getBean(String beanName) {
