@@ -18,8 +18,8 @@ public class ConfigLoader {
 	}
 
 	private ConfigMap loadConfigMap(String resourcePath) throws IOException {
-		InputStream inputStream = ConfigLoader.class.
-			getResourceAsStream(resourcePath);
+		InputStream inputStream = ConfigLoader.class
+			.getResourceAsStream(resourcePath);
 		if (inputStream == null) {
 			throw new IllegalArgumentException("resource not found " + resourcePath);
 		}
@@ -27,5 +27,4 @@ public class ConfigLoader {
 		objectMapper.setPropertyNamingStrategy(new PropertyNamingStrategies.KebabCaseStrategy());
 		return objectMapper.readValue(inputStream, ConfigMap.class);
 	}
-
 }
