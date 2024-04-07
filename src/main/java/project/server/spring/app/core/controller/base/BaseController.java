@@ -1,12 +1,9 @@
 package project.server.spring.app.core.controller.base;
 
-import static project.server.spring.app.core.global.error.ErrorMessage.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import project.server.spring.app.core.dto.UserInfoDto;
-import project.server.spring.app.core.global.exception.AuthenticationException;
 import project.server.spring.app.core.service.user.UserService;
 import project.server.spring.framework.annotation.Controller;
 import project.server.spring.framework.annotation.RequestMapping;
@@ -38,9 +35,6 @@ public class BaseController {
 	@RequestMapping(value = "/profile", method = HttpMethod.GET)
 	public ModelAndView profile(HttpServletRequest request, HttpServletResponse response) {
 		HttpSession session = request.getSession();
-		if (session == null) {
-			throw new AuthenticationException(AUTHENTICATION_FAILED.getMessage());
-		}
 		Long userId = (Long)session.getAttribute(USER_ID);
 		ModelAndView modelAndView = new ModelAndView("my-info");
 		UserInfoDto userInfo = userService.getUserInfo(userId);

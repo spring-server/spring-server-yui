@@ -1,6 +1,6 @@
 package project.server.spring.framework.exception;
 
-public class DataAccessException extends RuntimeException {
+public class DataAccessException extends NestedRuntimeException {
 	public DataAccessException(String message) {
 		super(message);
 	}
