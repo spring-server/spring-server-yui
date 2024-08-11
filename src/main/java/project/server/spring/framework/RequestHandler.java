@@ -8,19 +8,19 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import project.server.spring.framework.context.ApplicationContext;
 import project.server.spring.framework.http.SyncHttpRequest;
 import project.server.spring.framework.http.SyncHttpResponse;
 import project.server.spring.framework.servlet.DispatcherServlet;
 
 public final class RequestHandler extends Thread {
 	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
-	private final DispatcherServlet dispatcherServlet;
+	private final DispatcherServlet dispatcherServlet = ApplicationContext.getBean(DispatcherServlet.class);
 
 	private Socket connection;
 
 	public RequestHandler(Socket connectionSocket) {
 		this.connection = connectionSocket;
-		this.dispatcherServlet = DispatcherServlet.getInstance();
 	}
 
 	@Override

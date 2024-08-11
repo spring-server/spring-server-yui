@@ -1,37 +1,35 @@
 package project.server.spring.framework.servlet;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import project.server.spring.framework.RequestHandler;
-import project.server.spring.framework.annotation.RequestMapping;
 import project.server.spring.framework.context.ApplicationContext;
+import project.server.spring.framework.exception.GlobalExceptionHandler;
+import project.server.spring.framework.exception.NoHandlerFoundException;
+import project.server.spring.framework.exception.ServletException;
 import project.server.spring.framework.http.Cookie;
 import project.server.spring.framework.http.HttpSession;
-import project.server.spring.framework.http.HttpStatus;
-import project.server.spring.framework.http.error.ErrorResponse;
-import project.server.spring.framework.servlet.handler.HandlerMethod;
+import project.server.spring.framework.servlet.handler.HandlerAdapter;
+import project.server.spring.framework.servlet.handler.HandlerExecutionChain;
+import project.server.spring.framework.servlet.handler.HandlerMapping;
 import project.server.spring.framework.util.PageProcessor;
 
 public class DispatcherServlet extends FrameworkServlet {
-	private static final DispatcherServlet SINGLE_INSTACE = new DispatcherServlet();
 
-	private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
-	private static final String DELIMETER = "/";
-	private static final String END_CHARCTER = "\\.";
-
+	private final List<HandlerMapping> handlerMappings;
+	private final GlobalExceptionHandler exceptionHandler;
+	private final List<HandlerAdapter> handlerAdapters;
+	private static final Logger log = LoggerFactory.getLogger(DispatcherServlet.class);
 	private static final String REDIRECT_INDEX = "redirect:";
 
-	private final ObjectMapper objectMapper = new ObjectMapper();
-
-	private DispatcherServlet() {
+	public DispatcherServlet() {
+		this.exceptionHandler = new GlobalExceptionHandler();
+		this.handlerMappings = ApplicationContext.getBeans(HandlerMapping.class);
+		this.handlerAdapters = ApplicationContext.getBeans(HandlerAdapter.class);
 	}
 
 	@Override
@@ -42,43 +40,23 @@ public class DispatcherServlet extends FrameworkServlet {
 		doDispatch(request, response);
 	}
 
-	private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws
-		InvocationTargetException,
-		IllegalAccessException, IOException {
+	private void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		try {
-			HandlerMethod handlerMethod = getHandlerMethod(request);
-			if (handlerMethod == null) {
-				throw new IllegalStateException("handler method does not exit");
+			HandlerExecutionChain handler = getHandler(request);
+			if (handler == null) {
+				throw new NoHandlerFoundException();
 			}
-			log.info("info : {} , {}", handlerMethod.getHandler(), handlerMethod.getMethod());
-			ModelAndView modelAndView = (ModelAndView)handlerMethod.getMethod()
-				.invoke(handlerMethod.getHandler(), request, response);
-			//TODO: 세션 처리해주는 로직 어떻게 분리할지
-			handleSession(request, response);
-			if (modelAndView.getView() == null) {
-				resolveResponseBody(response);
+			HandlerAdapter handlerAdapter = getHandlerAdapter(handler.getHandler());
+			if (!handler.applyPreHandle(request, response)) {
 				return;
 			}
-			resolveView(modelAndView, response);
+			ModelAndView modelAndView = handlerAdapter.handle(request, response, handler.getHandler());
+			handleSession(request, response);
+			processDispatchResult(response, modelAndView);
 		} catch (Exception exception) {
-			resolveException(response, exception);
+			exceptionHandler.resolveException(response, exception);
 		}
-	}
 
-	void resolveException(HttpServletResponse response, Exception exception) throws IOException {
-		Throwable cause = exception.getCause();
-		if (cause == null) {
-			response.setContentType("text/html; charset=UTF-8");
-			PageProcessor pageProcessor = new PageProcessor();
-			String page = pageProcessor.read("400.html");
-			response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), page.getBytes());
-			return;
-		}
-		ErrorResponse errorResponse = objectMapper.readValue(cause.toString(), ErrorResponse.class);
-		PageProcessor pageProcessor = new PageProcessor();
-		String page = pageProcessor.read("400.html");
-		response.setContentType("text/html; charset=UTF-8");
-		response.sendError(errorResponse.getCode(), page.getBytes());
 	}
 
 	private void resolveResponseBody(HttpServletResponse response) {
@@ -128,42 +106,31 @@ public class DispatcherServlet extends FrameworkServlet {
 		return viewName + ".html";
 	}
 
-	private HandlerMethod getHandlerMethod(HttpServletRequest request) {
-		Method targetMethod = null;
-		Object tagetHandler = null;
-		for (Object handler : ApplicationContext.getAllBeans()) {
-			Method mappingMethod = getMappingMethod(handler.getClass(), request);
-			if (targetMethod != null && mappingMethod != null) {
-				throw new IllegalStateException("handler method duplicated");
-			}
-			if (mappingMethod != null) {
-				targetMethod = mappingMethod;
-				tagetHandler = handler;
-			}
-		}
-		if (targetMethod == null) {
-			return null;
-		}
-		return new HandlerMethod(tagetHandler, targetMethod);
-	}
-
-	private Method getMappingMethod(Class<?> clazz, HttpServletRequest request) {
-		for (Method method : clazz.getDeclaredMethods()) {
-			if (method.isAnnotationPresent(RequestMapping.class)) {
-				RequestMapping requestMapping = method.getAnnotation(RequestMapping.class);
-				if (requestMapping.value().length == 0 || requestMapping.method().length == 0) {
-					continue;
-				}
-				if (request.getRequestURI().equals(requestMapping.value()[0]) && request.getHttpMethod()
-					.equals(requestMapping.method()[0])) {
-					return method;
-				}
+	private HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
+		for (HandlerMapping mapping : this.handlerMappings) {
+			HandlerExecutionChain handler = mapping.getHandler(request);
+			if (handler != null) {
+				return handler;
 			}
 		}
 		return null;
 	}
 
-	public static DispatcherServlet getInstance() {
-		return SINGLE_INSTACE;
+	private HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
+		for (HandlerAdapter adapter : this.handlerAdapters) {
+			if (adapter.supports(handler)) {
+				return adapter;
+			}
+		}
+		throw new ServletException("No adapter for handler [" + handler
+			+ "]: The DispatcherServlet configuration needs to include a HandlerAdapter that supports this handler");
+	}
+
+	private void processDispatchResult(HttpServletResponse response, ModelAndView modelAndView) throws IOException {
+		if (modelAndView.getView() == null) {
+			resolveResponseBody(response);
+			return;
+		}
+		resolveView(modelAndView, response);
 	}
 }
